@@ -1,0 +1,56 @@
+[
+    {
+        "name": "Gloss Rose Pétale",
+        "description": "Gloss hydratant fini brillant, effet volume instantané. Formule enrichie en huile de jojoba.",
+        "price": 32.000,
+        "stock": 25,
+        "brand": "Beautica",
+        "image": "Gloss/gloss-rose.png",
+        "featured": true
+    },
+    {
+        "name": "Gloss Nude Élégance",
+        "description": "Gloss nude transparent pour un effet naturel et lumineux.",
+        "price": 30.000,
+        "stock": 30,
+        "brand": "Beautica",
+        "image": "Gloss/gloss-nude.png",
+        "featured": false
+    },
+    {
+        "name": "Fond de Teint Fluide",
+        "description": "Fond de teint fluide couvrance modulable, effet seconde peau. Convient à tous types de peau.",
+        "price": 68.000,
+        "stock": 20,
+        "brand": "Beautica",
+        "image": "teint/fond-teint.png",
+        "featured": true
+    },
+    {
+        "name": "Poudre Compacte Matifiante",
+        "description": "Poudre compacte transparente pour matifier et fixer le maquillage toute la journée.",
+        "price": 40.000,
+        "stock": 35,
+        "brand": "Beautica",
+        "image": "teint/poudre.png",
+        "featured": false
+    },
+    {
+        "name": "Mascara Volume Intense",
+        "description": "Mascara volumateur avec brosse en fibres pour des cils spectaculaires.",
+        "price": 38.000,
+        "stock": 40,
+        "brand": "Beautica",
+        "image": "yeux/mascara.png",
+        "featured": true
+    },
+    {
+        "name": "Eyeliner Feutre Précision",
+        "description": "Eyeliner feutre pointe fine pour un trait précis et intense.",
+        "price": 28.000,
+        "stock": 45,
+        "brand": "Beautica",
+        "image": "yeux/eyeliner.png",
+        "featured": false
+    }
+]
