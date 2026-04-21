@@ -288,7 +288,9 @@
                     <span id="summary-total">{{ number_format($total, 2) }} TND</span>
                 </div>
 
-                <button class="checkout-btn" type="button">Commander</button>
+               <a href="{{ route('checkout.index') }}" class="checkout-btn" style="display:block;text-align:center;text-decoration:none;">
+    Commander
+</a>
             </aside>
         </div>
     @endif
