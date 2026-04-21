@@ -10,9 +10,9 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->decimal('total', 10, 2)->default(0);
-            $table->enum('status', ['en_attente', 'validee', 'annulee'])->default('en_attente');
+            $table->string('status')->default('confirmed');
             $table->timestamps();
         });
     }
