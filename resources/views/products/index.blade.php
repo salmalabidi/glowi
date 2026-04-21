@@ -55,9 +55,12 @@
     border-radius: 2px; background: #fff;
     font-family: 'Jost', sans-serif; font-size: 0.85rem;
     color: var(--text); outline: none;
-    transition: border-color 0.3s;
+    transition: border-color 0.3s, box-shadow 0.3s;
 }
-.search-input-wrap input:focus { border-color: var(--rose); }
+.search-input-wrap input:focus {
+    border-color: var(--rose);
+    box-shadow: 0 0 0 3px rgba(200,116,138,0.08);
+}
 .search-icon {
     position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
     color: var(--text-light); font-size: 0.9rem; pointer-events: none;
@@ -71,22 +74,19 @@
 .search-loading.active { display: block; }
 @keyframes spin { to { transform: translateY(-50%) rotate(360deg); } }
 
-.filter-select {
-    padding: 13px 16px;
-    border: 1px solid rgba(200,116,138,0.25);
-    border-radius: 2px; background: #fff;
-    font-family: 'Jost', sans-serif; font-size: 0.8rem;
-    color: var(--text); outline: none; cursor: none;
-    transition: border-color 0.3s;
-}
-.filter-select:focus { border-color: var(--rose); }
-
+.filter-select,
 .sort-select {
     padding: 13px 16px;
     border: 1px solid rgba(200,116,138,0.25);
     border-radius: 2px; background: #fff;
     font-family: 'Jost', sans-serif; font-size: 0.8rem;
     color: var(--text); outline: none; cursor: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+.filter-select:focus,
+.sort-select:focus {
+    border-color: var(--rose);
+    box-shadow: 0 0 0 3px rgba(200,116,138,0.08);
 }
 
 /* CATALOGUE BODY */
@@ -114,10 +114,11 @@
     padding: 9px 12px;
     color: var(--text-light); text-decoration: none;
     font-size: 0.82rem; border-radius: 2px;
-    transition: background 0.2s, color 0.2s;
+    transition: background 0.2s, color 0.2s, transform 0.2s;
 }
 .sidebar-links a:hover, .sidebar-links a.active {
     background: var(--rose-pale); color: var(--rose-deep);
+    transform: translateX(3px);
 }
 .sidebar-links a .count {
     font-size: 0.68rem; color: rgba(200,116,138,0.5);
@@ -127,7 +128,10 @@
 .price-range input[type=range] {
     width: 100%; accent-color: var(--rose); cursor: none;
 }
-.price-labels { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-light); margin-top: 6px; }
+.price-labels {
+    display: flex; justify-content: space-between;
+    font-size: 0.75rem; color: var(--text-light); margin-top: 6px;
+}
 
 /* PRODUCTS */
 .products-area {}
@@ -148,26 +152,56 @@
 #products-grid.loading { opacity: 0.4; }
 
 .product-card {
-    background: #fff; border-radius: 4px;
-    overflow: hidden; position: relative;
-    transition: transform 0.4s, box-shadow 0.4s;
+    background: #fff;
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
     cursor: none;
-    animation: cardIn 0.5s ease both;
+    border: 1px solid rgba(200,116,138,0.10);
+    transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.35s ease;
+    animation: cardIn 0.55s ease both;
+    will-change: transform;
 }
-@keyframes cardIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes cardIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 .product-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 24px 60px rgba(60,30,40,0.1);
+    transform: translateY(-8px);
+    box-shadow: 0 22px 55px rgba(60,30,40,0.12);
+    border-color: rgba(200,116,138,0.26);
 }
+.product-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        135deg,
+        rgba(255,255,255,0.00) 0%,
+        rgba(255,255,255,0.10) 45%,
+        rgba(255,255,255,0.00) 100%
+    );
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    pointer-events: none;
+}
+.product-card:hover::after {
+    opacity: 1;
+}
+
 .product-img-wrap {
     position: relative; aspect-ratio: 4/5; overflow: hidden;
-    background: var(--rose-pale);
+    background: linear-gradient(180deg, #f8edef 0%, var(--rose-pale) 100%);
 }
 .product-img-wrap img {
     width: 100%; height: 100%; object-fit: contain; padding: 20px;
-    transition: transform 0.6s ease;
+    transition: transform 0.6s ease, filter 0.45s ease;
 }
-.product-card:hover .product-img-wrap img { transform: scale(1.06); }
+.product-card:hover .product-img-wrap img {
+    transform: scale(1.06);
+    filter: brightness(1.03);
+}
+
 .product-overlay {
     position: absolute; inset: 0;
     background: rgba(26,15,20,0.55);
@@ -175,49 +209,80 @@
     opacity: 0; transition: opacity 0.35s;
 }
 .product-card:hover .product-overlay { opacity: 1; }
+
 .overlay-btn {
     background: #fff; color: var(--dark); border: none;
     font-family: 'Jost', sans-serif;
     font-size: 0.62rem; letter-spacing: 0.15em; text-transform: uppercase;
     padding: 10px 18px; border-radius: 2px; text-decoration: none;
-    transition: background 0.2s, color 0.2s;
+    transition: background 0.25s, color 0.25s, transform 0.25s, box-shadow 0.25s;
 }
-.overlay-btn:hover { background: var(--rose); color: #fff; }
+.overlay-btn:hover {
+    background: var(--rose); color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(200,116,138,0.18);
+}
+
 .wishlist-btn {
     width: 38px; height: 38px;
     background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.3);
     border-radius: 50%; display: flex; align-items: center; justify-content: center;
     cursor: none; color: #fff; font-size: 1rem;
-    transition: background 0.2s;
+    transition: background 0.25s, border-color 0.25s, transform 0.25s;
 }
-.wishlist-btn:hover { background: var(--rose); border-color: var(--rose); }
+.wishlist-btn:hover {
+    background: var(--rose); border-color: var(--rose);
+    transform: scale(1.06);
+}
+
 .product-badge {
     position: absolute; top: 14px; left: 14px;
     background: var(--rose); color: #fff;
     font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase;
     padding: 4px 10px; border-radius: 2px;
+    box-shadow: 0 8px 18px rgba(200,116,138,0.18);
 }
+
 .product-info { padding: 18px 20px 20px; }
-.product-cat { font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--rose); margin-bottom: 5px; }
+.product-cat {
+    font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--rose); margin-bottom: 5px;
+}
 .product-name {
     font-family: 'Cormorant Garamond', serif;
     font-size: 1.1rem; font-weight: 400; color: var(--text);
     margin-bottom: 3px; line-height: 1.3;
+    transition: color 0.3s ease;
 }
-.product-brand { font-size: 0.72rem; color: var(--text-light); margin-bottom: 12px; }
+.product-card:hover .product-name {
+    color: var(--rose-deep);
+}
+
+.product-brand {
+    font-size: 0.72rem; color: var(--text-light); margin-bottom: 12px;
+}
 .product-footer { display: flex; align-items: center; justify-content: space-between; }
 .product-price {
     font-family: 'Cormorant Garamond', serif;
     font-size: 1.25rem; font-weight: 500; color: var(--rose-deep);
+    transition: transform 0.3s ease, color 0.3s ease;
 }
+.product-card:hover .product-price {
+    transform: translateX(3px);
+}
+
 .add-mini {
     width: 32px; height: 32px; border-radius: 50%;
     background: var(--rose-pale); border: none; cursor: none;
     color: var(--rose); font-size: 1.2rem;
     display: flex; align-items: center; justify-content: center;
-    transition: background 0.2s, color 0.2s;
+    transition: background 0.25s, color 0.25s, transform 0.25s, box-shadow 0.25s;
 }
-.add-mini:hover { background: var(--rose); color: #fff; }
+.add-mini:hover {
+    background: var(--rose); color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(200,116,138,0.18);
+}
 
 /* EMPTY STATE */
 .empty-state {
@@ -229,6 +294,59 @@
     font-size: 1.6rem; color: var(--text); margin-bottom: 8px;
 }
 .empty-state p { color: var(--text-light); font-size: 0.88rem; }
+
+/* RESPONSIVE */
+@media (max-width: 1100px) {
+    #products-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .catalogue-body {
+        grid-template-columns: 220px 1fr;
+        gap: 28px;
+    }
+}
+
+@media (max-width: 900px) {
+    .catalogue-hero,
+    .search-bar-wrap {
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+
+    .catalogue-body {
+        grid-template-columns: 1fr;
+        padding: 32px 24px 80px;
+    }
+
+    .sidebar {
+        position: static;
+    }
+
+    .search-bar-inner {
+        flex-wrap: wrap;
+    }
+
+    .filter-select,
+    .sort-select {
+        flex: 1 1 180px;
+    }
+}
+
+@media (max-width: 640px) {
+    #products-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .catalogue-hero {
+        padding-top: 40px;
+        padding-bottom: 36px;
+    }
+
+    .catalogue-title {
+        font-size: 2.2rem;
+    }
+}
 </style>
 
 <!-- CATALOGUE HERO -->
@@ -255,18 +373,25 @@
             <input type="text" id="search-input" placeholder="Rechercher un produit, une marque..." value="{{ request('search') }}">
             <div class="search-loading" id="search-loader"></div>
         </div>
+
         <select class="filter-select" id="cat-filter" onchange="applyFilters()">
             <option value="">Toutes catégories</option>
             @foreach($categories as $cat)
-                <option value="{{ $cat->slug }}" {{ request('category') == $cat->slug ? 'selected' : '' }}>{{ $cat->name }}</option>
+                <option value="{{ $cat->slug }}" {{ request('category') == $cat->slug ? 'selected' : '' }}>
+                    {{ $cat->name }}
+                </option>
             @endforeach
         </select>
+
         <select class="filter-select" id="type-filter" onchange="applyFilters()">
             <option value="">Tous les types</option>
             @foreach($productTypes as $type)
-                <option value="{{ $type }}" {{ request('type') == $type ? 'selected' : '' }}>{{ $type }}</option>
+                <option value="{{ $type }}" {{ request('type') == $type ? 'selected' : '' }}>
+                    {{ $type }}
+                </option>
             @endforeach
         </select>
+
         <select class="sort-select" id="sort-filter" onchange="applyFilters()">
             <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Plus récents</option>
             <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Prix croissant</option>
@@ -282,7 +407,11 @@
         <div class="sidebar-section">
             <div class="sidebar-title">Catégories</div>
             <ul class="sidebar-links">
-                <li><a href="{{ route('products.index') }}" class="{{ !request('category') ? 'active' : '' }}">Tout voir <span class="count">{{ $totalCount }}</span></a></li>
+                <li>
+                    <a href="{{ route('products.index') }}" class="{{ !request('category') ? 'active' : '' }}">
+                        Tout voir <span class="count">{{ $totalCount }}</span>
+                    </a>
+                </li>
                 @foreach($categories as $cat)
                 <li>
                     <a href="{{ route('products.index', ['category' => $cat->slug]) }}" class="{{ request('category') == $cat->slug ? 'active' : '' }}">
@@ -292,6 +421,7 @@
                 @endforeach
             </ul>
         </div>
+
         @if(request('category') === 'maquillage')
         <div class="sidebar-section">
             <div class="sidebar-title">Type de maquillage</div>
@@ -302,18 +432,27 @@
             </ul>
         </div>
         @endif
+
         <div class="sidebar-section">
             <div class="sidebar-title">Prix</div>
             <div class="price-range">
                 <input type="range" min="0" max="200" value="{{ request('max_price', 200) }}" id="price-range" oninput="document.getElementById('price-val').textContent=this.value">
-                <div class="price-labels"><span>0 TND</span><span id="price-val">{{ request('max_price', 200) }} TND</span></div>
+                <div class="price-labels">
+                    <span>0 TND</span>
+                    <span id="price-val">{{ request('max_price', 200) }} TND</span>
+                </div>
             </div>
         </div>
+
         <div class="sidebar-section">
             <div class="sidebar-title">Marques</div>
             <ul class="sidebar-links">
                 @foreach($brands ?? [] as $brand)
-                <li><a href="{{ route('products.index', array_merge(request()->query(), ['brand' => $brand])) }}" class="{{ request('brand') == $brand ? 'active' : '' }}">{{ $brand }}</a></li>
+                <li>
+                    <a href="{{ route('products.index', array_merge(request()->query(), ['brand' => $brand])) }}" class="{{ request('brand') == $brand ? 'active' : '' }}">
+                        {{ $brand }}
+                    </a>
+                </li>
                 @endforeach
             </ul>
         </div>
@@ -326,6 +465,7 @@
                 <strong id="count-display">{{ $products->total() }}</strong> produits trouvés
             </div>
         </div>
+
         <div id="products-grid">
             @forelse($products as $index => $product)
             <div class="product-card" style="animation-delay: {{ $index * 0.05 }}s">
@@ -333,8 +473,13 @@
                     @if($loop->index < 3)
                         <span class="product-badge">Nouveau</span>
                     @endif
-                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}"
-                        onerror="this.src='https://via.placeholder.com/400x500/f5e6ea/c8748a?text={{ urlencode($product->name) }}'">
+
+                    <img
+                        src="{{ asset('storage/' . $product->image) }}"
+                        alt="{{ $product->name }}"
+                        onerror="this.src='https://via.placeholder.com/400x500/f5e6ea/c8748a?text={{ urlencode($product->name) }}'"
+                    >
+
                     <div class="product-overlay">
                         <a href="{{ route('products.show', $product) }}" class="overlay-btn">Voir</a>
                         @auth
@@ -342,10 +487,14 @@
                         @endauth
                     </div>
                 </div>
+
                 <div class="product-info">
-                    <div class="product-cat">{{ $product->category->name ?? '' }} {{ $product->product_type ? '— '.$product->product_type : '' }}</div>
+                    <div class="product-cat">
+                        {{ $product->category->name ?? '' }} {{ $product->product_type ? '— '.$product->product_type : '' }}
+                    </div>
                     <div class="product-name">{{ $product->name }}</div>
                     <div class="product-brand">{{ $product->brand }}</div>
+
                     <div class="product-footer">
                         <div class="product-price">{{ number_format($product->price, 2) }} TND</div>
                         @auth
@@ -362,7 +511,7 @@
             </div>
             @endforelse
         </div>
-        <!-- Pagination -->
+
         <div style="margin-top:40px; display:flex; justify-content:center;">
             {{ $products->withQueryString()->links() }}
         </div>
@@ -373,19 +522,20 @@
 
 @section('scripts')
 <script>
-// AJAX search with debounce
 let searchTimeout;
 const searchInput = document.getElementById('search-input');
 const loader = document.getElementById('search-loader');
 const grid = document.getElementById('products-grid');
 
-searchInput.addEventListener('input', () => {
-    clearTimeout(searchTimeout);
-    loader.classList.add('active');
-    searchTimeout = setTimeout(() => {
-        applyFilters();
-    }, 350);
-});
+if (searchInput) {
+    searchInput.addEventListener('input', () => {
+        clearTimeout(searchTimeout);
+        loader.classList.add('active');
+        searchTimeout = setTimeout(() => {
+            applyFilters();
+        }, 350);
+    });
+}
 
 function applyFilters() {
     const params = new URLSearchParams();
@@ -412,7 +562,7 @@ function applyFilters() {
             document.getElementById('count-display').textContent = data.count;
             grid.classList.remove('loading');
             loader.classList.remove('active');
-            // Re-animate
+
             grid.querySelectorAll('.product-card').forEach((c, i) => {
                 c.style.animationDelay = (i * 0.05) + 's';
             });
@@ -425,18 +575,34 @@ function applyFilters() {
 
 function addToCart(productId, btn) {
     btn.textContent = '…';
+
     fetch('/cart/add', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content },
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
         body: JSON.stringify({ product_id: productId, quantity: 1 })
     })
     .then(() => {
-        btn.textContent = '✓'; btn.style.background = 'var(--rose)'; btn.style.color = '#fff';
+        btn.textContent = '✓';
+        btn.style.background = 'var(--rose)';
+        btn.style.color = '#fff';
+
         const badge = document.querySelector('.cart-badge');
-        if (badge) badge.textContent = (parseInt(badge.textContent)||0) + 1;
-        setTimeout(() => { btn.textContent = '+'; btn.style.background = ''; btn.style.color = ''; }, 1500);
+        if (badge) {
+            badge.textContent = (parseInt(badge.textContent) || 0) + 1;
+        }
+
+        setTimeout(() => {
+            btn.textContent = '+';
+            btn.style.background = '';
+            btn.style.color = '';
+        }, 1500);
     })
-    .catch(() => { btn.textContent = '+'; });
+    .catch(() => {
+        btn.textContent = '+';
+    });
 }
 
 function toggleWish(btn) {
