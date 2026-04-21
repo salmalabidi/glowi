@@ -70,7 +70,7 @@
             left: 0;
             right: 0;
             z-index: 1200;
-            padding: 0 48px;
+            padding: 0 32px;
             height: 70px;
             display: flex;
             align-items: center;
@@ -84,6 +84,49 @@
 
         nav.scrolled {
             background: rgba(26, 15, 20, 0.97);
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            min-width: 220px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            border: 1px solid rgba(201,169,110,0.22);
+            background: linear-gradient(135deg, rgba(200,116,138,0.16), rgba(201,169,110,0.14));
+            color: #fff;
+            border-radius: 999px;
+            font-family: 'Jost', sans-serif;
+            font-size: 0.72rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            cursor: none;
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+            box-shadow: 0 8px 22px rgba(0,0,0,0.16);
+        }
+
+        .back-btn:hover {
+            transform: translateX(-3px) translateY(-1px);
+            border-color: rgba(201,169,110,0.45);
+            background: linear-gradient(135deg, rgba(200,116,138,0.28), rgba(201,169,110,0.22));
+            box-shadow: 0 14px 28px rgba(0,0,0,0.22);
+        }
+
+        .back-arrow {
+            font-size: 1rem;
+            line-height: 1;
+            color: var(--gold);
+            transition: transform 0.25s ease;
+        }
+
+        .back-btn:hover .back-arrow {
+            transform: translateX(-3px);
         }
 
         .nav-logo {
@@ -242,19 +285,36 @@
 
         .nav-cart {
             position: relative;
-            color: rgba(255,255,255,0.8);
+            color: rgba(255,255,255,0.82);
             text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 0.7rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            transition: color 0.3s;
+            justify-content: center;
+            transition: transform 0.25s ease, color 0.25s ease;
         }
 
         .nav-cart:hover {
             color: var(--gold);
+            transform: translateY(-2px);
+        }
+
+        .cart-icon-wrap {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            transition: transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+        }
+
+        .nav-cart:hover .cart-icon-wrap {
+            background: rgba(200,116,138,0.14);
+            border-color: rgba(200,116,138,0.28);
+            box-shadow: 0 12px 26px rgba(200,116,138,0.16);
+            transform: scale(1.06);
         }
 
         .nav-cart svg {
@@ -262,29 +322,46 @@
             height: 20px;
             stroke: currentColor;
             fill: none;
-            stroke-width: 1.5;
+            stroke-width: 1.7;
+            transition: transform 0.25s ease;
+        }
+
+        .nav-cart:hover svg {
+            transform: rotate(-6deg);
         }
 
         .cart-badge {
             position: absolute;
-            top: -6px;
-            right: -8px;
-            background: var(--rose);
+            top: -4px;
+            right: -4px;
+            background: linear-gradient(135deg, var(--rose), var(--gold));
             color: #fff;
-            font-size: 0.6rem;
-            font-weight: 500;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
+            font-size: 0.62rem;
+            font-weight: 600;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            border-radius: 999px;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 8px 16px rgba(200,116,138,0.28);
             animation: pulse-badge 2s infinite;
         }
 
         @keyframes pulse-badge {
             0%,100% { transform: scale(1); }
-            50% { transform: scale(1.15); }
+            50% { transform: scale(1.12); }
+        }
+
+        .cart-badge.bump {
+            animation: cartBadgeBump 0.35s ease;
+        }
+
+        @keyframes cartBadgeBump {
+            0%   { transform: scale(1); }
+            50%  { transform: scale(1.28); }
+            100% { transform: scale(1); }
         }
 
         .btn-connexion {
@@ -363,8 +440,7 @@
         }
 
         .user-dropdown a,
-        .user-dropdown button,
-        .user-dropdown .dropdown-disabled {
+        .user-dropdown button {
             display: block;
             width: 100%;
             padding: 12px 20px;
@@ -388,11 +464,6 @@
 
         .user-dropdown form {
             margin: 0;
-        }
-
-        .dropdown-disabled {
-            opacity: 0.55;
-            cursor: not-allowed;
         }
 
         main {
@@ -539,6 +610,21 @@
                 padding: 0 20px;
             }
 
+            .nav-left {
+                min-width: auto;
+                gap: 10px;
+            }
+
+            .back-btn {
+                padding: 8px 12px;
+                font-size: 0.64rem;
+                letter-spacing: 0.1em;
+            }
+
+            .back-btn span:last-child {
+                display: none;
+            }
+
             .nav-center {
                 display: none;
             }
@@ -562,7 +648,16 @@
     <div id="cursor-ring"></div>
 
     <nav id="navbar">
-        <a href="{{ route('home') }}" class="nav-logo">Glo<span>wi</span></a>
+        <div class="nav-left">
+            @if(!request()->routeIs('home'))
+                <button type="button" class="back-btn" onclick="window.history.back()" aria-label="Retour">
+                    <span class="back-arrow">←</span>
+                    <span>Retour</span>
+                </button>
+            @endif
+
+            <a href="{{ route('home') }}" class="nav-logo">Glo<span>wi</span></a>
+        </div>
 
         <div class="nav-center">
             <a href="{{ route('home') }}" class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}">Accueil</a>
@@ -590,13 +685,18 @@
         <div class="nav-right">
             @auth
                 <a href="{{ route('cart.index') }}" class="nav-cart" aria-label="Panier">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
-                        <line x1="3" y1="6" x2="21" y2="6"/>
-                        <path d="M16 10a4 4 0 01-8 0"/>
-                    </svg>
+                    <span class="cart-icon-wrap">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+                            <line x1="3" y1="6" x2="21" y2="6"/>
+                            <path d="M16 10a4 4 0 01-8 0"/>
+                        </svg>
+                    </span>
+
                     @if(isset($cartCount) && $cartCount > 0)
-                        <span class="cart-badge">{{ $cartCount }}</span>
+                        <span class="cart-badge" id="cart-badge">{{ $cartCount }}</span>
+                    @else
+                        <span class="cart-badge" id="cart-badge" style="display:none;">0</span>
                     @endif
                 </a>
 
@@ -605,15 +705,15 @@
                         <div class="user-avatar">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</div>
                     </button>
 
-                   <div class="user-dropdown" id="userDropdown">
-    <a href="{{ route('profile') }}">Mon profil</a>
-    <a href="{{ route('orders') }}">Mes commandes</a>
+                    <div class="user-dropdown" id="userDropdown">
+                        <a href="{{ route('profile') }}">Mon profil</a>
+                        <a href="{{ route('orders') }}">Mes commandes</a>
 
-    <form method="POST" action="{{ route('logout') }}">
-        @csrf
-        <button type="submit">Déconnexion</button>
-    </form>
-</div>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit">Déconnexion</button>
+                        </form>
+                    </div>
                 </div>
             @else
                 <a href="{{ route('login') }}" class="btn-connexion">Connexion</a>
@@ -686,8 +786,8 @@
             <div class="footer-col">
                 <h4>Compte</h4>
                 @auth
-                    <span>Mon profil</span>
-                    <span>Mes commandes</span>
+                    <a href="{{ route('profile') }}">Mon profil</a>
+                    <a href="{{ route('orders') }}">Mes commandes</a>
                     <a href="{{ route('cart.index') }}">Mon panier</a>
                 @else
                     <a href="{{ route('login') }}">Connexion</a>
@@ -777,6 +877,28 @@
                     userMenuTrigger.setAttribute('aria-expanded', 'false');
                 }
             });
+        }
+
+        function updateCartBadge(count, animate = true) {
+            const badge = document.getElementById('cart-badge');
+            if (!badge) return;
+
+            const safeCount = Math.max(0, parseInt(count || 0));
+
+            if (safeCount <= 0) {
+                badge.textContent = 0;
+                badge.style.display = 'none';
+                return;
+            }
+
+            badge.style.display = 'flex';
+            badge.textContent = safeCount;
+
+            if (animate) {
+                badge.classList.remove('bump');
+                void badge.offsetWidth;
+                badge.classList.add('bump');
+            }
         }
     </script>
 </body>

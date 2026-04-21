@@ -21,11 +21,13 @@ Route::get('/register', [AuthController::class, 'showRegister'])->name('register
 Route::post('/register', [AuthController::class, 'register'])->middleware('guest');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
-// CART (protected)
+// CART + ACCOUNT (protected)
 Route::middleware('auth')->group(function () {
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+    Route::patch('/cart/{item}/quantity', [CartController::class, 'updateQuantity'])->name('cart.quantity');
     Route::delete('/cart/{item}', [CartController::class, 'remove'])->name('cart.remove');
+
     Route::view('/profile', 'account.profile')->name('profile');
     Route::view('/orders', 'account.orders')->name('orders');
 });

@@ -17,14 +17,17 @@ class CartController extends Controller
                     return null;
                 }
 
+                $quantity = max(1, (int) $item['quantity']);
+                $subtotal = (float) $product->price * $quantity;
+
                 return [
                     'id' => $product->id,
                     'name' => $product->name,
                     'brand' => $product->brand,
-                    'price' => $product->price,
+                    'price' => (float) $product->price,
                     'image' => $product->image,
-                    'quantity' => $item['quantity'],
-                    'subtotal' => $product->price * $item['quantity'],
+                    'quantity' => $quantity,
+                    'subtotal' => $subtotal,
                 ];
             })
             ->filter()
@@ -48,7 +51,7 @@ class CartController extends Controller
         $found = false;
 
         foreach ($cart as &$item) {
-            if ($item['product_id'] == $data['product_id']) {
+            if ((int) $item['product_id'] === (int) $data['product_id']) {
                 $item['quantity'] += $quantity;
                 $found = true;
                 break;
@@ -57,7 +60,7 @@ class CartController extends Controller
 
         if (! $found) {
             $cart[] = [
-                'product_id' => $data['product_id'],
+                'product_id' => (int) $data['product_id'],
                 'quantity' => $quantity,
             ];
         }
@@ -70,14 +73,72 @@ class CartController extends Controller
         ]);
     }
 
-    public function remove($item)
+    public function updateQuantity(Request $request, $item)
     {
+        $data = $request->validate([
+            'action' => ['required', 'in:increase,decrease'],
+        ]);
+
         $cart = collect(session()->get('cart', []))
-            ->reject(fn ($cartItem) => $cartItem['product_id'] == $item)
+            ->map(function ($cartItem) use ($item, $data) {
+                if ((int) $cartItem['product_id'] === (int) $item) {
+                    if ($data['action'] === 'increase') {
+                        $cartItem['quantity'] += 1;
+                    }
+
+                    if ($data['action'] === 'decrease') {
+                        $cartItem['quantity'] -= 1;
+                    }
+                }
+
+                return $cartItem;
+            })
+            ->filter(fn ($cartItem) => (int) $cartItem['quantity'] > 0)
             ->values()
             ->all();
 
         session()->put('cart', $cart);
+
+        $product = Product::find($item);
+        $currentItem = collect($cart)->firstWhere('product_id', (int) $item);
+        $itemQuantity = $currentItem['quantity'] ?? 0;
+        $itemSubtotal = $product ? ((float) $product->price * $itemQuantity) : 0.0;
+        $cartCount = collect($cart)->sum('quantity');
+
+        $cartTotal = collect($cart)->sum(function ($cartItem) {
+            $product = Product::find($cartItem['product_id']);
+            if (! $product) {
+                return 0;
+            }
+
+            return (float) $product->price * (int) $cartItem['quantity'];
+        });
+
+        return response()->json([
+            'success' => true,
+            'count' => $cartCount,
+            'itemQuantity' => $itemQuantity,
+            'itemSubtotal' => number_format($itemSubtotal, 2, '.', ''),
+            'cartTotal' => number_format($cartTotal, 2, '.', ''),
+            'removed' => $itemQuantity <= 0,
+        ]);
+    }
+
+    public function remove(Request $request, $item)
+    {
+        $cart = collect(session()->get('cart', []))
+            ->reject(fn ($cartItem) => (int) $cartItem['product_id'] === (int) $item)
+            ->values()
+            ->all();
+
+        session()->put('cart', $cart);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'count' => collect($cart)->sum('quantity'),
+            ]);
+        }
 
         return redirect()->route('cart.index')->with('success', 'Produit retiré du panier.');
     }
