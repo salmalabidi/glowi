@@ -41,7 +41,6 @@
             cursor: none;
         }
 
-        /* CURSOR */
         #cursor {
             width: 12px;
             height: 12px;
@@ -86,7 +85,6 @@
             }
         }
 
-        /* NAVBAR */
         #navbar {
             position: fixed;
             top: 0; left: 0; right: 0;
@@ -154,7 +152,7 @@
             display: flex; align-items: center; gap: 10px;
             position: absolute; left: 50%; transform: translateX(-50%);
             background: transparent;
-            z-index: 1; /* ✅ intentionnellement bas — search wrap est z:9999 */
+            z-index: 1;
         }
 
         .nav-link {
@@ -235,12 +233,11 @@
             z-index: 1500;
         }
 
-        /* SEARCH INLINE */
         .nav-search-wrap {
             display: flex;
             align-items: center;
             position: relative;
-            z-index: 9999; /* ✅ FIX: au-dessus de tous les éléments nav */
+            z-index: 9999;
         }
 
         .nav-search-btn {
@@ -290,15 +287,15 @@
             top: 50%;
             transform: translateY(-50%);
             width: 0;
-            overflow: visible; /* ✅ FIX: était hidden, empêchait l'affichage */
+            overflow: visible;
             transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
             opacity: 0;
             pointer-events: none;
-            z-index: 9999; /* ✅ FIX: au-dessus des liens nav */
+            z-index: 9999;
         }
 
         .nav-search-input-wrap.open {
-            width: 280px; /* légèrement élargi pour plus de confort */
+            width: 280px;
             opacity: 1;
             pointer-events: all;
         }
@@ -316,7 +313,6 @@
             letter-spacing: 0.05em;
             outline: none;
             transition: border-color 0.3s;
-            /* ✅ FIX: clip au niveau de l'input, pas du wrap */
             clip-path: inset(0 0 0 0 round 999px 0 0 999px);
         }
 
@@ -333,7 +329,7 @@
             background: rgba(26,15,20,0.98);
             border: 1px solid rgba(201,169,110,0.2);
             border-radius: 14px;
-            z-index: 99999; /* ✅ FIX: au-dessus de tout */
+            z-index: 99999;
             box-shadow: 0 18px 50px rgba(0,0,0,0.4);
             backdrop-filter: blur(20px);
             display: none;
@@ -398,7 +394,6 @@
 
         @keyframes spinRing { to { transform: rotate(360deg); } }
 
-        /* CART */
         .nav-cart {
             position: relative; color: rgba(255,255,255,0.82);
             text-decoration: none; display: flex;
@@ -436,7 +431,6 @@
             animation: pulse-badge 2s infinite;
         }
 
-        /* WISHLIST BADGE */
         #wish-badge {
             background: linear-gradient(135deg, var(--rose), var(--rose-deep));
             font-size: 0.68rem;
@@ -449,166 +443,200 @@
         .cart-badge.bump { animation: cartBadgeBump 0.35s ease; }
         @keyframes cartBadgeBump { 0% { transform: scale(1); } 50% { transform: scale(1.28); } 100% { transform: scale(1); } }
 
-        /* USER */
         .user-menu {
-    position: relative;
-    z-index: 1500;
-}
+            position: relative;
+            z-index: 1500;
+        }
 
-.user-menu-trigger {
-    background: transparent;
-    border: none;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+        .user-menu-trigger {
+            background: transparent;
+            border: none;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-.user-avatar {
-    position: relative;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #cf8ca0, #dcb177);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-size: 0.86rem;
-    font-weight: 700;
-    letter-spacing: 0.03em;
-    border: 1px solid rgba(255,255,255,0.16);
-    box-shadow: 0 12px 28px rgba(200,116,138,0.18);
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
+        .user-avatar {
+            position: relative;
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #cf8ca0, #dcb177);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            border: 1px solid rgba(255,255,255,0.16);
+            box-shadow: 0 14px 30px rgba(200,116,138,0.18);
+            overflow: hidden;
+            transition: transform 0.32s ease, box-shadow 0.32s ease;
+        }
 
-.user-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    z-index: 3;
-}
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            z-index: 3;
+        }
 
-.user-avatar::before {
-    content: '';
-    position: absolute;
-    inset: -35%;
-    background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.42), transparent 55%);
-    animation: spinRing 4s linear infinite;
-    opacity: 0.85;
-}
+        .user-avatar::before {
+            content: '';
+            position: absolute;
+            inset: -35%;
+            background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.42), transparent 55%);
+            animation: spinRing 4s linear infinite;
+            opacity: 0.85;
+        }
 
-.user-avatar::after {
-    content: '';
-    position: absolute;
-    inset: 3px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
-    backdrop-filter: blur(8px);
-}
+        .user-avatar::after {
+            content: '';
+            position: absolute;
+            inset: 3px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+            backdrop-filter: blur(8px);
+        }
 
-.user-avatar span {
-    position: relative;
-    z-index: 2;
-}
+        .user-avatar span {
+            position: relative;
+            z-index: 2;
+        }
 
-.user-menu:hover .user-avatar,
-.user-menu.open .user-avatar {
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 18px 36px rgba(200,116,138,0.24);
-}
+        .user-menu:hover .user-avatar,
+        .user-menu.open .user-avatar {
+            transform: translateY(-2px) scale(1.06);
+            box-shadow: 0 20px 38px rgba(200,116,138,0.24);
+        }
 
-.user-dropdown {
-    position: absolute;
-    top: calc(100% + 14px);
-    right: 0;
-    min-width: 280px;
-    background: rgba(26,15,20,0.98);
-    border: 1px solid rgba(201,169,110,0.18);
-    border-radius: 18px;
-    padding: 0;
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(10px) scale(0.98);
-    transition: opacity 0.28s ease, transform 0.28s ease;
-    z-index: 2000;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.30);
-    backdrop-filter: blur(20px);
-    overflow: hidden;
-}
+        .user-dropdown {
+            position: absolute;
+            top: calc(100% + 14px);
+            right: 0;
+            min-width: 295px;
+            background: rgba(20, 12, 17, 0.98);
+            border: 1px solid rgba(201,169,110,0.16);
+            border-radius: 22px;
+            padding: 0;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(14px) scale(0.96);
+            transition: opacity 0.32s ease, transform 0.32s ease;
+            z-index: 2000;
+            box-shadow: 0 26px 60px rgba(0,0,0,0.34);
+            backdrop-filter: blur(20px);
+            overflow: hidden;
+        }
 
-.user-menu.open .user-dropdown {
-    opacity: 1;
-    pointer-events: auto;
-    transform: translateY(0) scale(1);
-}
+        .user-dropdown::before {
+            content: '';
+            position: absolute;
+            top: -40px;
+            right: -20px;
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, rgba(200,116,138,0.16), transparent 70%);
+            pointer-events: none;
+        }
 
-.user-dropdown-header {
-    padding: 18px 20px 16px;
-    background: linear-gradient(135deg, rgba(200,116,138,0.14), rgba(201,169,110,0.10));
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-}
+        .user-menu.open .user-dropdown {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0) scale(1);
+        }
 
-.user-dropdown-name {
-    color: #fff;
-    font-size: 0.95rem;
-    font-weight: 600;
-    margin-bottom: 4px;
-}
+        .user-dropdown-header {
+            position: relative;
+            padding: 20px 22px 16px;
+            background: linear-gradient(135deg, rgba(200,116,138,0.14), rgba(201,169,110,0.10));
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
 
-.user-dropdown-email {
-    color: rgba(255,255,255,0.45);
-    font-size: 0.76rem;
-}
+        .user-dropdown-name {
+            color: #fff;
+            font-size: 0.98rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
 
-.user-dropdown-links {
-    padding: 10px;
-}
+        .user-dropdown-email {
+            color: rgba(255,255,255,0.45);
+            font-size: 0.76rem;
+        }
 
-.user-dropdown-links a,
-.user-dropdown-links button {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 13px 14px;
-    border-radius: 14px;
-    text-decoration: none;
-    background: none;
-    border: none;
-    color: rgba(255,255,255,0.78);
-    font-family: 'Jost', sans-serif;
-    font-size: 0.82rem;
-    text-align: left;
-    transition: background 0.22s ease, color 0.22s ease, transform 0.22s ease;
-}
+        .user-dropdown-links {
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
 
-.user-dropdown-links a:hover,
-.user-dropdown-links button:hover {
-    background: rgba(255,255,255,0.05);
-    color: var(--gold);
-    transform: translateX(4px);
-}
+        .user-dropdown-links a,
+        .user-dropdown-links button {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            padding: 14px 15px;
+            border-radius: 16px;
+            text-decoration: none;
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.80);
+            font-family: 'Jost', sans-serif;
+            font-size: 0.84rem;
+            text-align: left;
+            transition: background 0.24s ease, color 0.24s ease, transform 0.24s ease, border-color 0.24s ease;
+            border: 1px solid transparent;
+        }
 
-.user-dropdown-links .admin-link {
-    background: linear-gradient(135deg, rgba(200,116,138,0.10), rgba(201,169,110,0.08));
-    border: 1px solid rgba(200,116,138,0.10);
-    color: #fff;
-}
+        .user-dropdown-links a:hover,
+        .user-dropdown-links button:hover {
+            background: rgba(255,255,255,0.05);
+            color: var(--gold);
+            transform: translateX(5px);
+            border-color: rgba(255,255,255,0.04);
+        }
 
-.user-dropdown-links .admin-link:hover {
-    background: linear-gradient(135deg, rgba(200,116,138,0.18), rgba(201,169,110,0.14));
-    color: var(--gold);
-}
+        .dropdown-link-text {
+            display: inline-flex;
+            align-items: center;
+        }
 
-.logout-btn {
-    cursor: none;
-}
-        /* MARQUEE */
+        .dropdown-link-arrow {
+            color: rgba(255,255,255,0.28);
+            font-size: 0.92rem;
+            transition: transform 0.24s ease, color 0.24s ease;
+        }
+
+        .user-dropdown-links a:hover .dropdown-link-arrow,
+        .user-dropdown-links button:hover .dropdown-link-arrow {
+            transform: translateX(3px);
+            color: var(--gold);
+        }
+
+        .user-dropdown-links .admin-link {
+            background: linear-gradient(135deg, rgba(200,116,138,0.12), rgba(201,169,110,0.08));
+            border: 1px solid rgba(200,116,138,0.10);
+            color: #fff;
+        }
+
+        .user-dropdown-links .admin-link:hover {
+            background: linear-gradient(135deg, rgba(200,116,138,0.18), rgba(201,169,110,0.14));
+            color: var(--gold);
+        }
+
+        .logout-btn {
+            cursor: none;
+        }
+
         .marquee-bar {
             position: fixed;
             top: 78px;
@@ -642,7 +670,6 @@
         .marquee-inner span::before { content: '✦'; margin-right: 34px; opacity: 0.66; }
         @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
-        /* MAIN */
         main {
             padding-top: 120px;
             min-height: 100vh;
@@ -651,7 +678,6 @@
 
         main > *:first-child { margin-top: 0 !important; }
 
-        /* TOAST */
         #toast-success {
             position: fixed; bottom: 32px; right: 32px; z-index: 9999;
             background: var(--dark); color: #fff;
@@ -664,7 +690,6 @@
 
         @keyframes slideIn { from { transform: translateX(60px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-        /* FOOTER */
         footer {
             position: relative; overflow: hidden;
             background:
@@ -737,9 +762,28 @@
             filter: blur(0.5px);
         }
 
-        /* REVEAL */
         .reveal-up { opacity: 0; transform: translateY(22px); transition: opacity 0.8s ease, transform 0.8s ease; }
         .reveal-up.show { opacity: 1; transform: translateY(0); }
+
+        .btn-connexion {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 18px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, var(--rose), var(--rose-deep));
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.74rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            transition: transform .25s ease, box-shadow .25s ease;
+        }
+
+        .btn-connexion:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px rgba(200,116,138,0.20);
+        }
 
         @media (max-width: 900px) {
             #navbar { padding: 0 18px; }
@@ -785,9 +829,9 @@
                 </button>
                 <div class="dropdown-menu">
                     <a href="{{ route('products.index', ['category' => 'maquillage']) }}">Tout le maquillage</a>
-                    <a href="{{ route('products.index', ['category' => 'maquillage', 'type' => 'Yeux']) }}">✦ Yeux</a>
-                    <a href="{{ route('products.index', ['category' => 'maquillage', 'type' => 'Teint']) }}">✦ Teint</a>
-                    <a href="{{ route('products.index', ['category' => 'maquillage', 'type' => 'Gloss']) }}">✦ Lèvres</a>
+                    <a href="{{ route('products.index', ['category' => 'maquillage', 'type' => 'Yeux']) }}">Yeux</a>
+                    <a href="{{ route('products.index', ['category' => 'maquillage', 'type' => 'Teint']) }}">Teint</a>
+                    <a href="{{ route('products.index', ['category' => 'maquillage', 'type' => 'Gloss']) }}">Lèvres</a>
                 </div>
             </div>
 
@@ -815,7 +859,6 @@
             </div>
 
             @auth
-                {{-- WISHLIST --}}
                 <a href="{{ route('wishlist.index') }}" class="nav-cart" aria-label="Wishlist" title="Ma wishlist">
                     <span class="cart-icon-wrap">
                         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7">
@@ -827,7 +870,6 @@
                     </span>
                 </a>
 
-                {{-- PANIER --}}
                 <a href="{{ route('cart.index') }}" class="nav-cart" aria-label="Panier">
                     <span class="cart-icon-wrap">
                         <svg viewBox="0 0 24 24">
@@ -844,44 +886,6 @@
                 </a>
 
                 <div class="user-menu" id="userMenu">
-    <button type="button" class="user-menu-trigger" id="userMenuTrigger" aria-expanded="false" aria-haspopup="true">
-        
-    </button>
-
-    <div class="user-dropdown" id="userDropdown">
-        <div class="user-dropdown-header">
-            <div class="user-dropdown-name">{{ Auth::user()->name }}</div>
-            <div class="user-dropdown-email">{{ Auth::user()->email }}</div>
-        </div>
-
-        <div class="user-dropdown-links">
-            <a href="{{ route('profile.index') }}">
-                
-                <span>Mon profil</span>
-            </a>
-
-            <a href="{{ route('orders') }}">
-                
-                <span>Mes commandes</span>
-            </a>
-
-            @if(Auth::user()->is_admin)
-                <a href="{{ route('admin.dashboard') }}" class="admin-link">
-                
-                    <span>Dashboard admin</span>
-                </a>
-            @endif
-
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="logout-btn">
-                    <span>↘</span>
-                    <span>Déconnexion</span>
-                </button>
-            </form>
-        </div>
-    </div>
-</div>
                     <button type="button" class="user-menu-trigger" id="userMenuTrigger" aria-expanded="false" aria-haspopup="true">
                         <div class="user-avatar">
                             @if(Auth::user()->avatar)
@@ -891,13 +895,39 @@
                             @endif
                         </div>
                     </button>
+
                     <div class="user-dropdown" id="userDropdown">
-                        <a href="{{ route('profile') }}">Mon profil</a>
-                        <a href="{{ route('orders') }}">Mes commandes</a>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit">Déconnexion</button>
-                        </form>
+                        <div class="user-dropdown-header">
+                            <div class="user-dropdown-name">{{ Auth::user()->name }}</div>
+                            <div class="user-dropdown-email">{{ Auth::user()->email }}</div>
+                        </div>
+
+                        <div class="user-dropdown-links">
+                            <a href="{{ route('profile.index') }}">
+                                <span class="dropdown-link-text">Mon profil</span>
+                                <span class="dropdown-link-arrow">↗</span>
+                            </a>
+
+                            <a href="{{ route('orders') }}">
+                                <span class="dropdown-link-text">Mes commandes</span>
+                                <span class="dropdown-link-arrow">↗</span>
+                            </a>
+
+                            @if(Auth::user()->is_admin)
+                                <a href="{{ route('admin.dashboard') }}" class="admin-link">
+                                    <span class="dropdown-link-text">Dashboard admin</span>
+                                    <span class="dropdown-link-arrow">↗</span>
+                                </a>
+                            @endif
+
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="logout-btn">
+                                    <span class="dropdown-link-text">Déconnexion</span>
+                                    <span class="dropdown-link-arrow">↗</span>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             @else
@@ -954,7 +984,7 @@
             <div class="footer-col">
                 <h4>Compte</h4>
                 @auth
-                    <a href="{{ route('profile') }}">Mon profil</a>
+                    <a href="{{ route('profile.index') }}">Mon profil</a>
                     <a href="{{ route('orders') }}">Mes commandes</a>
                     <a href="{{ route('cart.index') }}">Mon panier</a>
                 @else
@@ -971,13 +1001,8 @@
 
     @yield('scripts')
 
-    {{-- ========== SCRIPTS GLOBAUX ========== --}}
     <script>
-    // Encapsulé dans une IIFE pour éviter les conflits de variables
-    // avec les scripts des pages (ex: searchTimeout, grid, loader, etc.)
     (function () {
-
-        // ── CURSEUR PERSONNALISÉ ──────────────────────────────────────────────
         const cursor = document.getElementById('cursor');
         const ring   = document.getElementById('cursor-ring');
 
@@ -1012,8 +1037,8 @@
                 } catch (_) {}
             }
 
-            document.addEventListener('mousemove',    onPointerMove, { passive: true });
-            document.addEventListener('pointermove',  onPointerMove, { passive: true });
+            document.addEventListener('mousemove', onPointerMove, { passive: true });
+            document.addEventListener('pointermove', onPointerMove, { passive: true });
 
             (function animateRing() {
                 ringX += (mouseX - ringX) * 0.18;
@@ -1056,15 +1081,14 @@
             });
         }
 
-        // ── NAVBAR + MARQUEE ─────────────────────────────────────────────────
         const navbar     = document.getElementById('navbar');
         const marqueeBar = document.getElementById('marqueeBar');
         let lastScrollY  = window.scrollY;
 
         window.addEventListener('scroll', () => {
             const y = window.scrollY;
-            navbar.classList.toggle('scrolled',     y > 20);
-            navbar.classList.toggle('nav-compact',  y > 80);
+            navbar.classList.toggle('scrolled', y > 20);
+            navbar.classList.toggle('nav-compact', y > 80);
 
             if (y > 180 && y > lastScrollY) {
                 navbar.classList.add('nav-hidden');
@@ -1076,41 +1100,38 @@
             lastScrollY = y;
         });
 
-        // ── TOAST ────────────────────────────────────────────────────────────
         const toast = document.getElementById('toast-success');
         if (toast) {
             setTimeout(() => {
                 toast.style.transition = 'opacity 0.4s';
-                toast.style.opacity    = '0';
+                toast.style.opacity = '0';
                 setTimeout(() => toast.remove(), 400);
             }, 3500);
         }
 
-        // ── USER MENU ────────────────────────────────────────────────────────
-      const userMenu = document.getElementById('userMenu');
-const userMenuTrigger = document.getElementById('userMenuTrigger');
+        const userMenu = document.getElementById('userMenu');
+        const userMenuTrigger = document.getElementById('userMenuTrigger');
 
-if (userMenu && userMenuTrigger) {
-    userMenuTrigger.addEventListener('click', function (e) {
-        e.stopPropagation();
-        const open = userMenu.classList.toggle('open');
-        userMenuTrigger.setAttribute('aria-expanded', open ? 'true' : 'false');
-    });
+        if (userMenu && userMenuTrigger) {
+            userMenuTrigger.addEventListener('click', function (e) {
+                e.stopPropagation();
+                const isOpen = userMenu.classList.toggle('open');
+                userMenuTrigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            });
 
-    document.addEventListener('click', function (e) {
-        if (!userMenu.contains(e.target)) {
-            userMenu.classList.remove('open');
-            userMenuTrigger.setAttribute('aria-expanded', 'false');
+            document.addEventListener('click', function (e) {
+                if (!userMenu.contains(e.target)) {
+                    userMenu.classList.remove('open');
+                    userMenuTrigger.setAttribute('aria-expanded', 'false');
+                }
+            });
         }
-    });
-}
 
-        // ── RECHERCHE NAVBAR ─────────────────────────────────────────────────
-        const searchToggleBtn      = document.getElementById('searchToggleBtn');
-        const searchInputWrap      = document.getElementById('searchInputWrap');
-        const navSearchInput       = document.getElementById('navSearchInput');
-        const searchResultsDrop    = document.getElementById('searchResultsDropdown');
-        let searchOpen        = false;
+        const searchToggleBtn   = document.getElementById('searchToggleBtn');
+        const searchInputWrap   = document.getElementById('searchInputWrap');
+        const navSearchInput    = document.getElementById('navSearchInput');
+        const searchResultsDrop = document.getElementById('searchResultsDropdown');
+        let searchOpen = false;
         let _navSearchTimeout = null;
 
         if (searchToggleBtn) {
@@ -1132,7 +1153,10 @@ if (userMenu && userMenuTrigger) {
             navSearchInput.addEventListener('input', function () {
                 clearTimeout(_navSearchTimeout);
                 const q = this.value.trim();
-                if (q.length < 2) { searchResultsDrop.classList.remove('show'); return; }
+                if (q.length < 2) {
+                    searchResultsDrop.classList.remove('show');
+                    return;
+                }
                 searchResultsDrop.innerHTML = '<div class="search-loading">Recherche…</div>';
                 searchResultsDrop.classList.add('show');
                 _navSearchTimeout = setTimeout(() => doNavSearch(q), 300);
@@ -1145,7 +1169,7 @@ if (userMenu && userMenuTrigger) {
 
         async function doNavSearch(q) {
             try {
-                const res  = await fetch(`/products/search?q=${encodeURIComponent(q)}`);
+                const res = await fetch(`/products/search?q=${encodeURIComponent(q)}`);
                 const data = await res.json();
                 if (!data.length) {
                     searchResultsDrop.innerHTML = '<div class="search-no-results">Aucun résultat trouvé</div>';
@@ -1182,13 +1206,12 @@ if (userMenu && userMenuTrigger) {
             }
         });
 
-        // ── BADGE PANIER (global) ────────────────────────────────────────────
         window.updateCartBadge = function (count, animate = true) {
             const badge = document.getElementById('cart-badge');
             if (!badge) return;
             const n = Math.max(0, parseInt(count || 0));
             badge.style.display = n > 0 ? 'flex' : 'none';
-            badge.textContent   = n;
+            badge.textContent = n;
             if (animate && n > 0) {
                 badge.classList.remove('bump');
                 void badge.offsetWidth;
@@ -1196,15 +1219,13 @@ if (userMenu && userMenuTrigger) {
             }
         };
 
-        // ── ANIMATIONS AU SCROLL ─────────────────────────────────────────────
         document.addEventListener('DOMContentLoaded', () => {
             const obs = new IntersectionObserver(entries => {
                 entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('show'); });
             }, { threshold: 0.12 });
             document.querySelectorAll('.reveal-up').forEach(el => obs.observe(el));
         });
-
-    })(); // fin IIFE
+    })();
     </script>
 </body>
 </html>
