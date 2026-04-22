@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Order;
+use App\Models\Review;
+use App\Models\Wishlist;
+
 
 class User extends Authenticatable
 {
@@ -16,6 +20,7 @@ class User extends Authenticatable
         'email',
         'password',
         'avatar',
+        'is_admin',
     ];
 
     protected $hidden = [
@@ -28,6 +33,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password'          => 'hashed',
+            'is_admin'          => 'boolean',
         ];
     }
 
@@ -36,10 +42,12 @@ class User extends Authenticatable
         return $this->hasMany(Order::class);
     }
 
+
     public function products(): HasMany
     {
         return $this->hasMany(Product::class);
     }
+
 
     public function reviews(): HasMany
     {
