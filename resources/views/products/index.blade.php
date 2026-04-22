@@ -973,7 +973,7 @@
                             max="200"
                             value="{{ request('max_price', 200) }}"
                             id="price-range"
-                            oninput="document.getElementById('price-val').textContent=this.value + ' TND'"
+                            oninput="document.getElementById('price-val').textContent=this.value+' TND'; clearTimeout(window._priceT); window._priceT=setTimeout(applyFilters, 500);"
                         >
                         <div class="price-labels">
                             <span>0 TND</span>
@@ -1047,7 +1047,7 @@
                                 <a href="{{ route('products.show', $product) }}" class="overlay-btn">Voir</a>
 
                                 @auth
-                                    <button class="wishlist-btn" onclick="toggleWish(this)">♡</button>
+                                    <button class="wishlist-btn" onclick="toggleWish(this, {{ $product->id }})">♡</button>
                                 @endauth
                             </div>
                         </div>
@@ -1117,7 +1117,7 @@ function applyFilters() {
     if (cat) params.set('category', cat);
     if (type) params.set('type', type);
     if (sort && sort !== 'newest') params.set('sort', sort);
-    if (price && price != 200) params.set('max_price', price);
+    if (price && parseInt(price) < 200) params.set('max_price', price);
 
     const url = '/products/search?' + params.toString();
 
@@ -1182,8 +1182,31 @@ function addToCart(productId, btn) {
     });
 }
 
-function toggleWish(btn) {
-    btn.textContent = btn.textContent === '♡' ? '♥' : '♡';
+function toggleWish(btn, productId) {
+    btn.disabled = true;
+
+    fetch('/wishlist/toggle', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({ product_id: productId })
+    })
+    .then(r => r.json())
+    .then(data => {
+        btn.textContent = data.added ? '♥' : '♡';
+        btn.classList.toggle('wishlisted', data.added);
+        btn.disabled = false;
+
+        // Mettre à jour le badge wishlist dans la navbar
+        const wishBadge = document.getElementById('wish-badge');
+        if (wishBadge) {
+            wishBadge.style.display = data.count > 0 ? 'flex' : 'none';
+            wishBadge.textContent = data.count > 0 ? data.count : '♡';
+        }
+    })
+    .catch(() => { btn.disabled = false; });
 }
 
 document.addEventListener('DOMContentLoaded', function () {

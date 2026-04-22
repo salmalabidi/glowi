@@ -79,7 +79,7 @@ class CheckoutController extends Controller
             $order = Order::create([
                 'user_id' => Auth::id(),
                 'total' => $total,
-                'status' => 'confirmed',
+                'status' => 'pending',
             ]);
 
             foreach ($cart as $item) {
