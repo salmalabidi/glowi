@@ -6,11 +6,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-
-// Ajoute cette ligne en haut pour importer les modèles
 use App\Models\Order;
 use App\Models\Review;
-use App\Models\Wishlist; // Important
+use App\Models\Wishlist;
 
 class User extends Authenticatable
 {
@@ -21,6 +19,7 @@ class User extends Authenticatable
         'email',
         'password',
         'avatar',
+        'is_admin',
     ];
 
     protected $hidden = [
@@ -33,6 +32,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password'          => 'hashed',
+            'is_admin'          => 'boolean',
         ];
     }
 
@@ -40,7 +40,7 @@ class User extends Authenticatable
     {
         return $this->hasMany(Order::class);
     }
-    
+
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
@@ -48,7 +48,6 @@ class User extends Authenticatable
 
     public function wishlists(): HasMany
     {
-        // CORRIGÉ ICI : 'Wishlist' au lieu de 'Wishlists'
         return $this->hasMany(Wishlist::class);
     }
 }
