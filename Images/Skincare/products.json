@@ -1,0 +1,236 @@
+[
+    {
+        "name": "ACM Azéane Crème",
+        "description": "Crème apaisante pour peaux sensibles et réactives.",
+        "price": 42.000,
+        "stock": 25,
+        "brand": "ACM",
+        "image": "acmAzéane.png",
+        "featured": false
+    },
+    {
+        "name": "ACM Dépiwhite",
+        "description": "Soin éclaircissant anti-taches pour un teint uniforme.",
+        "price": 55.000,
+        "stock": 18,
+        "brand": "ACM",
+        "image": "acmDépiwhite.png",
+        "featured": true
+    },
+    {
+        "name": "SVR Sebiaclear Active",
+        "description": "Soin intensif anti-imperfections pour peaux grasses.",
+        "price": 48.000,
+        "stock": 22,
+        "brand": "SVR",
+        "image": "activeSebiaclear.png",
+        "featured": true
+    },
+    {
+        "name": "Bioderma Atoderm Gel Douche",
+        "description": "Gel douche surgras doux pour peaux sensibles.",
+        "price": 32.000,
+        "stock": 35,
+        "brand": "Bioderma",
+        "image": "atocleanBioderma.png",
+        "featured": false
+    },
+    {
+        "name": "Bioderma Atoderm Crème",
+        "description": "Crème hydratante nourrissante pour peaux sensibles.",
+        "price": 38.000,
+        "stock": 30,
+        "brand": "Bioderma",
+        "image": "atodermbioderma.png",
+        "featured": false
+    },
+    {
+        "name": "Avène Hydrance Riche",
+        "description": "Crème hydratante riche pour peaux sensibles déshydratées.",
+        "price": 58.000,
+        "stock": 20,
+        "brand": "Avène",
+        "image": "avaneHydrance.png",
+        "featured": true
+    },
+    {
+        "name": "Avène Cleanance",
+        "description": "Soin matifiant pour peaux grasses à imperfections.",
+        "price": 45.000,
+        "stock": 25,
+        "brand": "Avène",
+        "image": "aveneCleanance.png",
+        "featured": false
+    },
+    {
+        "name": "Avène Hydrance UV",
+        "description": "Crème hydratante avec protection solaire SPF 30.",
+        "price": 62.000,
+        "stock": 15,
+        "brand": "Avène",
+        "image": "avénéHydrance.png",
+        "featured": false
+    },
+    {
+        "name": "Bioderma B3 Crème",
+        "description": "Crème réparatrice enrichie en vitamine B3.",
+        "price": 52.000,
+        "stock": 18,
+        "brand": "Bioderma",
+        "image": "B3.png",
+        "featured": false
+    },
+    {
+        "name": "Bioderma Atoderma Intensive",
+        "description": "Baume ultra-nourrissant pour peaux très sensibles.",
+        "price": 65.000,
+        "stock": 12,
+        "brand": "Bioderma",
+        "image": "biodermaatoderma.png",
+        "featured": true
+    },
+    {
+        "name": "Bioderma Pigmentbio C-Concentrate",
+        "description": "Soin concentré anti-taches pour un teint uniforme.",
+        "price": 78.000,
+        "stock": 10,
+        "brand": "Bioderma",
+        "image": "BiodermaC-correctionPigmentBio.png",
+        "featured": true
+    },
+    {
+        "name": "Bioderma Pigmentbio",
+        "description": "Soin quotidien éclaircissant anti-taches.",
+        "price": 55.000,
+        "stock": 20,
+        "brand": "Bioderma",
+        "image": "biodermapigment.png",
+        "featured": false
+    },
+    {
+        "name": "SVR Cicavit+",
+        "description": "Crème réparatrice accélérant la cicatrisation.",
+        "price": 35.000,
+        "stock": 28,
+        "brand": "SVR",
+        "image": "cicavit+.png",
+        "featured": false
+    },
+    {
+        "name": "Bioderma Eau Micellaire",
+        "description": "Eau micellaire démaquillante pour peaux sensibles.",
+        "price": 28.000,
+        "stock": 40,
+        "brand": "Bioderma",
+        "image": "eauMicellaire.png",
+        "featured": false
+    },
+    {
+        "name": "SVR Physiopure Eau Micellaire",
+        "description": "Eau micellaire purifiante pour peaux sensibles.",
+        "price": 32.000,
+        "stock": 25,
+        "brand": "SVR",
+        "image": "eaumicellairePhysiopureSvr.png",
+        "featured": false
+    },
+    {
+        "name": "SVR Physiopure Gel Nettoyant",
+        "description": "Gel nettoyant doux pour peaux sensibles.",
+        "price": 35.000,
+        "stock": 22,
+        "brand": "SVR",
+        "image": "gelNettoyant.png",
+        "featured": false
+    },
+    {
+        "name": "Pack Concombre Soin",
+        "description": "Pack soin au concombre pour hydrater la peau.",
+        "price": 45.000,
+        "stock": 15,
+        "brand": "Beautica",
+        "image": "packConcombre.png",
+        "featured": true
+    },
+    {
+        "name": "SVR Physiopure",
+        "description": "Soin hydratant purifiant pour peaux sensibles.",
+        "price": 38.000,
+        "stock": 20,
+        "brand": "SVR",
+        "image": "physioupuresvr.png",
+        "featured": false
+    },
+    {
+        "name": "Bioderma Pigmentbio Crème",
+        "description": "Crème éclaircissante quotidienne anti-taches.",
+        "price": 52.000,
+        "stock": 18,
+        "brand": "Bioderma",
+        "image": "pigmentbio.png",
+        "featured": false
+    },
+    {
+        "name": "Bioderma Pigmentbio Bioderma",
+        "description": "Soin complet anti-taches pour un teint uniforme.",
+        "price": 60.000,
+        "stock": 14,
+        "brand": "Bioderma",
+        "image": "pigmentbioBioderma.png",
+        "featured": false
+    },
+    {
+        "name": "Bioderma Sensibio Gel Nettoyant",
+        "description": "Gel nettoyant apaisant pour peaux sensibles.",
+        "price": 35.000,
+        "stock": 30,
+        "brand": "Bioderma",
+        "image": "sensibioGelNettoyant.png",
+        "featured": false
+    },
+    {
+        "name": "Bioderma Sensibio Eau Micellaire",
+        "description": "Eau micellaire apaisante pour peaux sensibles.",
+        "price": 32.000,
+        "stock": 35,
+        "brand": "Bioderma",
+        "image": "sensibioMicellaireBioderma.png",
+        "featured": true
+    },
+    {
+        "name": "Sérum Concombre",
+        "description": "Sérum hydratant au concombre pour un effet fraîcheur.",
+        "price": 48.000,
+        "stock": 20,
+        "brand": "Beautica",
+        "image": "serumConcombre.png",
+        "featured": true
+    },
+    {
+        "name": "SVR SPF 50",
+        "description": "Protection solaire très haute protection.",
+        "price": 55.000,
+        "stock": 25,
+        "brand": "SVR",
+        "image": "spf50.png",
+        "featured": true
+    },
+    {
+        "name": "SVR Déodorant",
+        "description": "Déodorant régulateur pour peaux sensibles.",
+        "price": 22.000,
+        "stock": 30,
+        "brand": "SVR",
+        "image": "svrDeo.png",
+        "featured": false
+    },
+    {
+        "name": "Zynia Lait Hydratant",
+        "description": "Lait corporel hydratant pour une peau douce.",
+        "price": 28.000,
+        "stock": 35,
+        "brand": "Zynia",
+        "image": "zyniaLaitHydratant.png",
+        "featured": false
+    }
+]

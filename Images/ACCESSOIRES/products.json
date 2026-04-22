@@ -1,0 +1,56 @@
+[
+    {
+        "name": "Set 10 Mini Pinceaux",
+        "description": "Set de 10 mini pinceaux de maquillage pour un application précise et professionnelle.",
+        "price": 35.000,
+        "stock": 20,
+        "brand": "Beautica",
+        "image": "10miniBrush.png",
+        "featured": true
+    },
+    {
+        "name": "Brosse à Cheveux",
+        "description": "Brosse démêlante en bois avec picots souples pour tous types de cheveux.",
+        "price": 25.000,
+        "stock": 15,
+        "brand": "Beautica",
+        "image": "BrosseAcheveux.png",
+        "featured": false
+    },
+    {
+        "name": "Coton Démaquillant",
+        "description": "Disques de coton 100% bio, doux et résistants pour un démaquillage en douceur.",
+        "price": 8.500,
+        "stock": 50,
+        "brand": "Beautica",
+        "image": "coton.png",
+        "featured": false
+    },
+    {
+        "name": "Éponge de Maquillage",
+        "description": "Éponge blender sans latex pour une application fluide du fond de teint.",
+        "price": 18.000,
+        "stock": 30,
+        "brand": "Beautica",
+        "image": "eponge.png",
+        "featured": true
+    },
+    {
+        "name": "Recourbe-Cils Essence",
+        "description": "Recourbe-cils professionnel avec tampon silicone pour des cils bombés en un geste.",
+        "price": 22.000,
+        "stock": 12,
+        "brand": "Essence",
+        "image": "EssenceCoureCil.png",
+        "featured": false
+    },
+    {
+        "name": "Tweezers Titane",
+        "description": "Pince à épiler de précision en titane pour une prise optimale des poils.",
+        "price": 19.000,
+        "stock": 18,
+        "brand": "TiTana",
+        "image": "TiTana.png",
+        "featured": false
+    }
+]
