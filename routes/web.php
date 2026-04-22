@@ -10,9 +10,14 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\Admin\DashboardController;
 
 // HOME
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+});
 
 // PRODUCTS
 Route::get('/products',           [ProductController::class, 'index'])->name('products.index');

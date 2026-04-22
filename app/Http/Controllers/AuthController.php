@@ -19,44 +19,60 @@ class AuthController extends Controller
         return view('auth.login-register', ['mode' => 'register']);
     }
 
-    public function login(Request $request)
-    {
-        $request->validate([
-            'email'    => 'required|email',
-            'password' => 'required',
-        ]);
-
-        if (Auth::attempt(['email' => $request->email, 'password' => $request->password], $request->remember)) {
-            $request->session()->regenerate();
-            return redirect()->intended(route('home'))->with('success', 'Bienvenue ' . Auth::user()->name . ' !');
-        }
-
-        return back()->withErrors(['email' => 'Email ou mot de passe incorrect.'])->withInput();
-    }
-
     public function register(Request $request)
     {
-        $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|email|unique:users',
-            'password' => 'required|min:6|confirmed',
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:4', 'confirmed'],
         ]);
 
         $user = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'password' => Hash::make($request->password),
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+            'is_admin' => false,
         ]);
 
         Auth::login($user);
-        return redirect()->route('home')->with('success', 'Compte créé ! Bienvenue ' . $user->name . ' 🌸');
+
+        return redirect()->route('home')->with('success', 'Compte créé avec succès.');
+    }
+
+    public function login(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required', 'string'],
+        ]);
+
+        if (Auth::attempt($credentials, $request->boolean('remember'))) {
+            $request->session()->regenerate();
+
+            if (Auth::user()->is_admin) {
+                return redirect()->route('admin.dashboard')
+                    ->with('success', 'Bienvenue dans l’espace administrateur.');
+            }
+
+            return redirect()->route('home')
+                ->with('success', 'Connexion réussie.');
+        }
+
+        return back()
+            ->withErrors([
+                'email' => 'Email ou mot de passe incorrect.',
+            ])
+            ->withInput()
+            ->with('mode', 'login');
     }
 
     public function logout(Request $request)
     {
         Auth::logout();
+
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect()->route('home');
+
+        return redirect()->route('home')->with('success', 'Déconnexion réussie.');
     }
 }
