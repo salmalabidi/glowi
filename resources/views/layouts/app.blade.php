@@ -154,7 +154,7 @@
             display: flex; align-items: center; gap: 10px;
             position: absolute; left: 50%; transform: translateX(-50%);
             background: transparent;
-            z-index: 1;
+            z-index: 1; /* ✅ intentionnellement bas — search wrap est z:9999 */
         }
 
         .nav-link {
@@ -240,7 +240,7 @@
             display: flex;
             align-items: center;
             position: relative;
-            z-index: 1600;
+            z-index: 9999; /* ✅ FIX: au-dessus de tous les éléments nav */
         }
 
         .nav-search-btn {
@@ -290,15 +290,15 @@
             top: 50%;
             transform: translateY(-50%);
             width: 0;
-            overflow: hidden;
+            overflow: visible; /* ✅ FIX: était hidden, empêchait l'affichage */
             transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
             opacity: 0;
             pointer-events: none;
-            z-index: 1550;
+            z-index: 9999; /* ✅ FIX: au-dessus des liens nav */
         }
 
         .nav-search-input-wrap.open {
-            width: 240px;
+            width: 280px; /* légèrement élargi pour plus de confort */
             opacity: 1;
             pointer-events: all;
         }
@@ -316,6 +316,8 @@
             letter-spacing: 0.05em;
             outline: none;
             transition: border-color 0.3s;
+            /* ✅ FIX: clip au niveau de l'input, pas du wrap */
+            clip-path: inset(0 0 0 0 round 999px 0 0 999px);
         }
 
         .nav-search-input::placeholder { color: rgba(255,255,255,0.35); }
@@ -331,7 +333,7 @@
             background: rgba(26,15,20,0.98);
             border: 1px solid rgba(201,169,110,0.2);
             border-radius: 14px;
-            z-index: 2000;
+            z-index: 99999; /* ✅ FIX: au-dessus de tout */
             box-shadow: 0 18px 50px rgba(0,0,0,0.4);
             backdrop-filter: blur(20px);
             display: none;

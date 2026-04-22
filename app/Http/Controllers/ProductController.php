@@ -33,6 +33,9 @@ class ProductController extends Controller
         if ($request->max_price) {
             $query->where('price', '<=', $request->max_price);
         }
+        if ($request->min_price) {
+            $query->where('price', '>=', $request->min_price);
+        }
 
         // Search
         if ($request->search) {
@@ -53,6 +56,7 @@ class ProductController extends Controller
             default:           $query->latest(); break;
         }
 
+        $filteredCount = $query->count(); // ✅ compter AVANT paginate
         $products = $query->paginate(12);
         $totalCount = Product::where('active', true)->where('stock', '>', 0)->count();
         $categories = Category::withCount(['products' => fn($q) => $q->where('active', true)->where('stock', '>', 0)])->get();
@@ -62,7 +66,7 @@ class ProductController extends Controller
         // AJAX request → return partial HTML + count
         if ($request->ajax() || $request->wantsJson()) {
             $html = view('products.partials.grid', compact('products'))->render();
-            return response()->json(['html' => $html, 'count' => $query->count()]);
+            return response()->json(['html' => $html, 'count' => $filteredCount]);
         }
 
         return view('products.index', compact('products', 'categories', 'productTypes', 'brands', 'totalCount'));
@@ -74,8 +78,10 @@ class ProductController extends Controller
             ->where('active', true)
             ->where('stock', '>', 0);
 
-        if ($request->search) {
-            $s = $request->search;
+        // ✅ FIX: accepter ?q= (navbar) ET ?search= (catalogue)
+        $searchTerm = $request->q ?? $request->search;
+        if ($searchTerm) {
+            $s = $searchTerm;
             $query->where(function($q) use ($s) {
                 $q->where('name', 'like', "%$s%")
                   ->orWhere('description', 'like', "%$s%")
@@ -91,6 +97,9 @@ class ProductController extends Controller
         }
         if ($request->max_price) {
             $query->where('price', '<=', $request->max_price);
+        }
+        if ($request->min_price) {
+            $query->where('price', '>=', $request->min_price);
         }
         switch ($request->sort) {
             case 'price_asc':  $query->orderBy('price', 'asc'); break;
