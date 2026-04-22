@@ -14,22 +14,15 @@ class ProductController extends Controller
             ->where('active', true)
             ->where('stock', '>', 0);
 
-        // Category filter
         if ($request->category) {
             $query->whereHas('category', fn($q) => $q->where('slug', $request->category));
         }
-
-        // Product type filter
         if ($request->type) {
             $query->where('product_type', $request->type);
         }
-
-        // Brand filter
         if ($request->brand) {
             $query->where('brand', $request->brand);
         }
-
-        // Price filter
         if ($request->max_price) {
             $query->where('price', '<=', $request->max_price);
         }
@@ -37,18 +30,17 @@ class ProductController extends Controller
             $query->where('price', '>=', $request->min_price);
         }
 
-        // Search
+        // Recherche insensible à la casse
         if ($request->search) {
-            $search = $request->search;
+            $search = mb_strtolower($request->search);
             $query->where(function($q) use ($search) {
-                $q->where('name', 'like', "%$search%")
-                  ->orWhere('description', 'like', "%$search%")
-                  ->orWhere('brand', 'like', "%$search%")
-                  ->orWhere('product_type', 'like', "%$search%");
+                $q->whereRaw('LOWER(name) LIKE ?', ["%{$search}%"])
+                  ->orWhereRaw('LOWER(description) LIKE ?', ["%{$search}%"])
+                  ->orWhereRaw('LOWER(brand) LIKE ?', ["%{$search}%"])
+                  ->orWhereRaw('LOWER(product_type) LIKE ?', ["%{$search}%"]);
             });
         }
 
-        // Sort
         switch ($request->sort) {
             case 'price_asc':  $query->orderBy('price', 'asc'); break;
             case 'price_desc': $query->orderBy('price', 'desc'); break;
@@ -63,7 +55,6 @@ class ProductController extends Controller
         $productTypes  = Product::where('active', true)->where('stock', '>', 0)->distinct()->pluck('product_type')->filter()->values();
         $brands        = Product::where('active', true)->where('stock', '>', 0)->distinct()->pluck('brand')->filter()->sort()->values();
 
-        // AJAX request → return partial HTML + count
         if ($request->ajax() || $request->wantsJson()) {
             $html = view('products.partials.grid', compact('products'))->render();
             return response()->json(['html' => $html, 'count' => $filteredCount]);
@@ -74,18 +65,56 @@ class ProductController extends Controller
 
     public function search(Request $request)
     {
+        // ── NAVBAR SEARCH (?q=) ─────────────────────────────────────────────
+        if ($request->has('q')) {
+            $q = trim($request->q);
+            if (strlen($q) < 2) {
+                return response()->json([]);
+            }
+            $s = mb_strtolower($q);
+            try {
+                $products = Product::with('category')
+                    ->where('active', true)
+                    ->where('stock', '>', 0)
+                    ->where(function($query) use ($s) {
+                        $query->whereRaw('LOWER(name) LIKE ?', ["%{$s}%"])
+                              ->orWhereRaw('LOWER(brand) LIKE ?', ["%{$s}%"])
+                              ->orWhereRaw('LOWER(product_type) LIKE ?', ["%{$s}%"])
+                              ->orWhereRaw('LOWER(description) LIKE ?', ["%{$s}%"]);
+                    })
+                    ->orderBy('name')
+                    ->limit(8)
+                    ->get();
+
+                $results = $products->map(function($p) {
+                    return [
+                        'id'        => $p->id,
+                        'name'      => $p->name,
+                        'brand'     => $p->brand ?? '',
+                        'price'     => (float) $p->price,
+                        'image_url' => $p->image ? asset('storage/' . $p->image) : null,
+                        'category'  => optional($p->category)->name ?? '',
+                    ];
+                })->values();
+
+                return response()->json($results);
+            } catch (\Exception $e) {
+                return response()->json([], 500);
+            }
+        }
+
+        // ── CATALOGUE AJAX (?search= ou filtres) ────────────────────────────
         $query = Product::with('category')
             ->where('active', true)
             ->where('stock', '>', 0);
 
-        $searchTerm = $request->q ?? $request->search;
-        if ($searchTerm) {
-            $s = $searchTerm;
+        if ($request->search) {
+            $s = mb_strtolower($request->search);
             $query->where(function($q) use ($s) {
-                $q->where('name', 'like', "%$s%")
-                  ->orWhere('description', 'like', "%$s%")
-                  ->orWhere('brand', 'like', "%$s%")
-                  ->orWhere('product_type', 'like', "%$s%");
+                $q->whereRaw('LOWER(name) LIKE ?', ["%{$s}%"])
+                  ->orWhereRaw('LOWER(description) LIKE ?', ["%{$s}%"])
+                  ->orWhereRaw('LOWER(brand) LIKE ?', ["%{$s}%"])
+                  ->orWhereRaw('LOWER(product_type) LIKE ?', ["%{$s}%"]);
             });
         }
         if ($request->category) {
@@ -114,38 +143,9 @@ class ProductController extends Controller
         return response()->json(['html' => $html, 'count' => $count]);
     }
 
-    // ✅ NOUVEAU : recherche live pour la navbar (retourne un tableau JSON de produits)
-    public function navSearch(Request $request)
-    {
-        $q = $request->q;
-        if (!$q || strlen($q) < 2) {
-            return response()->json([]);
-        }
-
-        $products = Product::with('category')
-            ->where('active', true)
-            ->where('stock', '>', 0)
-            ->where(function($query) use ($q) {
-                $query->where('name', 'like', "%$q%")
-                      ->orWhere('brand', 'like', "%$q%")
-                      ->orWhere('product_type', 'like', "%$q%");
-            })
-            ->limit(6)
-            ->get();
-
-        return response()->json($products->map(fn($p) => [
-            'id'        => $p->id,
-            'name'      => $p->name,
-            'brand'     => $p->brand,
-            'price'     => $p->price,
-            'image_url' => $p->image ? asset('storage/' . $p->image) : null,
-        ]));
-    }
-
     public function show(Product $product)
     {
         $product->load('category');
-
         $related = Product::where('active', true)
             ->where('stock', '>', 0)
             ->where('id', '!=', $product->id)
