@@ -53,7 +53,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile/avatar',        [ProfileController::class, 'deleteAvatar'])->name('profile.avatar.delete');
 
     // COMMANDES
-    Route::view('/orders', 'account.orders')->name('orders');
+  Route::get('/orders', [OrderController::class, 'index'])->name('orders');
 
     // Alias profil (compatibilité anciennes vues)
     Route::get('/profile/show', fn() => redirect()->route('profile.index'))->name('profile');

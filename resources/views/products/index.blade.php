@@ -383,7 +383,7 @@
     color: rgba(200,116,138,0.60);
 }
 
-/* ✅ FIX: Double slider prix */
+/* SLIDER */
 .price-range-dual {
     position: relative;
     height: 36px;
@@ -465,6 +465,14 @@
 /* RESULTS */
 .products-area {
     min-width: 0;
+    transition: opacity 0.35s ease, filter 0.35s ease, transform 0.35s ease;
+}
+
+.products-area.transitioning {
+    opacity: 0.45;
+    filter: blur(7px);
+    transform: translateY(6px);
+    pointer-events: none;
 }
 
 .results-bar {
@@ -651,6 +659,12 @@
     border-color: var(--rose);
 }
 
+.wishlist-btn.wishlisted {
+    background: var(--rose);
+    border-color: var(--rose);
+    color: #fff;
+}
+
 .product-badge {
     position: absolute;
     top: 16px;
@@ -778,6 +792,14 @@
     margin-top: 40px;
     display: flex;
     justify-content: center;
+    transition: opacity 0.35s ease, filter 0.35s ease, transform 0.35s ease;
+}
+
+.pagination-wrap.pagination-transitioning {
+    opacity: 0.3;
+    filter: blur(6px);
+    transform: translateY(8px);
+    pointer-events: none;
 }
 
 /* SCROLL ANIM */
@@ -886,7 +908,6 @@
 </style>
 
 <div class="catalogue-page">
-    <!-- HERO -->
     <div class="catalogue-hero {{ $heroClass }}">
         <div class="catalogue-hero-inner">
             <div class="catalogue-copy">
@@ -927,7 +948,6 @@
         </div>
     </div>
 
-    <!-- SEARCH BAR -->
     <div class="search-bar-wrap">
         <div class="search-bar-inner">
             <div class="search-input-wrap">
@@ -976,7 +996,6 @@
     </div>
 
     <div class="catalogue-body">
-        <!-- SIDEBAR -->
         <aside class="sidebar">
             <div class="sidebar-shell fade-up">
                 <div class="sidebar-section">
@@ -1079,8 +1098,7 @@
             </div>
         </aside>
 
-        <!-- PRODUCTS -->
-        <div class="products-area">
+        <div class="products-area" id="products-area">
             <div class="results-bar fade-up">
                 <div class="results-left">
                     <div class="results-count">
@@ -1156,7 +1174,7 @@
                 @endforelse
             </div>
 
-            <div class="pagination-wrap">
+            <div id="pagination-container" class="pagination-wrap">
                 {{ $products->withQueryString()->links() }}
             </div>
         </div>
@@ -1171,12 +1189,55 @@ let searchTimeout;
 const searchInput = document.getElementById('search-input');
 const loader = document.getElementById('search-loader');
 const grid = document.getElementById('products-grid');
+const productsArea = document.getElementById('products-area');
 
-// ✅ Double slider prix — track colorée via div réelle (pas ::before)
+function setCatalogueTransition(active) {
+    const pagination = document.getElementById('pagination-container');
+
+    if (active) {
+        productsArea?.classList.add('transitioning');
+        grid?.classList.add('loading');
+        pagination?.classList.add('pagination-transitioning');
+        loader?.classList.add('active');
+    } else {
+        productsArea?.classList.remove('transitioning');
+        grid?.classList.remove('loading');
+        pagination?.classList.remove('pagination-transitioning');
+        loader?.classList.remove('active');
+    }
+}
+
+function refreshWishlistState() {
+    @auth
+    fetch('/wishlist/ids')
+        .then(r => r.json())
+        .then(ids => {
+            document.querySelectorAll('.wishlist-btn').forEach(btn => {
+                const match = btn.getAttribute('onclick')?.match(/\d+/);
+                if (!match) return;
+
+                const productId = parseInt(match[0]);
+                const active = ids.includes(productId);
+
+                btn.textContent = active ? '♥' : '♡';
+                btn.classList.toggle('wishlisted', active);
+            });
+        })
+        .catch(() => {});
+    @endauth
+}
+
+function animateNewCards() {
+    grid.querySelectorAll('.product-card').forEach((c, i) => {
+        c.style.animationDelay = (i * 0.05) + 's';
+        c.classList.add('show');
+    });
+}
+
 function updatePriceRange() {
     const minSlider = document.getElementById('price-range-min');
     const maxSlider = document.getElementById('price-range-max');
-    const track     = document.getElementById('rangeTrack');
+    const track = document.getElementById('rangeTrack');
     if (!minSlider || !maxSlider) return;
 
     let minVal = parseInt(minSlider.value);
@@ -1194,7 +1255,7 @@ function updatePriceRange() {
     if (track) {
         const pct1 = (minVal / 200) * 100;
         const pct2 = (maxVal / 200) * 100;
-        track.style.left  = pct1 + '%';
+        track.style.left = pct1 + '%';
         track.style.width = (pct2 - pct1) + '%';
     }
 
@@ -1204,22 +1265,7 @@ function updatePriceRange() {
 
 document.addEventListener('DOMContentLoaded', function() {
     updatePriceRange();
-
-    // Initialiser l'état des cœurs : remplir ♥ pour les produits déjà dans la wishlist
-    @auth
-    fetch('/wishlist/ids')
-        .then(r => r.json())
-        .then(ids => {
-            document.querySelectorAll('.wishlist-btn').forEach(btn => {
-                const match = btn.getAttribute('onclick').match(/\d+/);
-                if (match && ids.includes(parseInt(match[0]))) {
-                    btn.textContent = '♥';
-                    btn.classList.add('wishlisted');
-                }
-            });
-        })
-        .catch(() => {});
-    @endauth
+    refreshWishlistState();
 });
 
 if (searchInput) {
@@ -1233,29 +1279,31 @@ if (searchInput) {
     });
 }
 
-function applyFilters() {
-    const params = new URLSearchParams();
-    const search = searchInput ? searchInput.value.trim() : '';
-    const cat = document.getElementById('cat-filter').value;
-    const type = document.getElementById('type-filter').value;
-    const sort = document.getElementById('sort-filter').value;
-    const minRange = document.getElementById('price-range-min');
-    const maxRange = document.getElementById('price-range-max');
-    const minPrice = minRange ? parseInt(minRange.value) : 0;
-    const maxPrice = maxRange ? parseInt(maxRange.value) : 200;
+function applyFilters(urlOverride = null) {
+    let url = urlOverride;
 
-    if (search) params.set('search', search);
-    if (cat) params.set('category', cat);
-    if (type) params.set('type', type);
-    if (sort && sort !== 'newest') params.set('sort', sort);
-    // ✅ FIX: envoyer min_price et max_price séparément
-    if (minPrice > 0) params.set('min_price', minPrice);
-    if (maxPrice < 200) params.set('max_price', maxPrice);
+    if (!url) {
+        const params = new URLSearchParams();
+        const search = searchInput ? searchInput.value.trim() : '';
+        const cat = document.getElementById('cat-filter').value;
+        const type = document.getElementById('type-filter').value;
+        const sort = document.getElementById('sort-filter').value;
+        const minRange = document.getElementById('price-range-min');
+        const maxRange = document.getElementById('price-range-max');
+        const minPrice = minRange ? parseInt(minRange.value) : 0;
+        const maxPrice = maxRange ? parseInt(maxRange.value) : 200;
 
-    const url = '/products/search?' + params.toString();
+        if (search) params.set('search', search);
+        if (cat) params.set('category', cat);
+        if (type) params.set('type', type);
+        if (sort && sort !== 'newest') params.set('sort', sort);
+        if (minPrice > 0) params.set('min_price', minPrice);
+        if (maxPrice < 200) params.set('max_price', maxPrice);
 
-    grid.classList.add('loading');
-    loader.classList.add('active');
+        url = '/products/search?' + params.toString();
+    }
+
+    setCatalogueTransition(true);
 
     fetch(url, {
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
@@ -1264,17 +1312,21 @@ function applyFilters() {
     .then(data => {
         grid.innerHTML = data.html;
         document.getElementById('count-display').textContent = data.count;
-        grid.classList.remove('loading');
-        loader.classList.remove('active');
 
-        grid.querySelectorAll('.product-card').forEach((c, i) => {
-            c.style.animationDelay = (i * 0.05) + 's';
-            c.classList.add('show');
-        });
+        const pagination = document.getElementById('pagination-container');
+        if (pagination) {
+            pagination.innerHTML = data.pagination;
+        }
+
+        animateNewCards();
+        refreshWishlistState();
+
+        setTimeout(() => {
+            setCatalogueTransition(false);
+        }, 180);
     })
     .catch(() => {
-        grid.classList.remove('loading');
-        loader.classList.remove('active');
+        setCatalogueTransition(false);
     });
 }
 
@@ -1334,14 +1386,7 @@ function toggleWishlist(productId, btn) {
         const data = await response.json();
 
         btn.textContent = data.added ? '♥' : '♡';
-
-        if (data.added) {
-            btn.style.background = 'var(--rose)';
-            btn.style.borderColor = 'var(--rose)';
-        } else {
-            btn.style.background = '';
-            btn.style.borderColor = '';
-        }
+        btn.classList.toggle('wishlisted', data.added);
 
         if (typeof updateWishlistBadge === 'function') {
             updateWishlistBadge(data.count);
@@ -1351,6 +1396,23 @@ function toggleWishlist(productId, btn) {
         alert('Impossible de mettre à jour la wishlist.');
     });
 }
+
+document.addEventListener('click', function (e) {
+    const link = e.target.closest('.glowi-pagination a');
+    if (!link) return;
+
+    e.preventDefault();
+
+    const url = link.getAttribute('href');
+    if (!url) return;
+
+    applyFilters(url);
+
+    window.scrollTo({
+        top: document.querySelector('.catalogue-body').offsetTop - 80,
+        behavior: 'smooth'
+    });
+});
 
 document.addEventListener('DOMContentLoaded', function () {
     const observer = new IntersectionObserver((entries) => {
