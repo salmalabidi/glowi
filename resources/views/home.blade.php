@@ -556,7 +556,7 @@
                 <div class="product-overlay">
                     <a href="{{ route('products.show', $product) }}" class="overlay-btn">Voir</a>
                     @auth
-                    <button class="wishlist-btn" title="Wishlist">♡</button>
+                    <button class="wishlist-btn" onclick="toggleWish(this, {{ $product->id }})" title="Wishlist">♡</button>
                     @endauth
                 </div>
             </div>
@@ -611,7 +611,7 @@
                     <div class="product-overlay">
                         <a href="{{ route('products.show', $product) }}" class="overlay-btn">Voir</a>
                         @auth
-                        <button class="wishlist-btn">♡</button>
+                        <button class="wishlist-btn" onclick="toggleWish(this, {{ $product->id }})">♡</button>
                         @endauth
                     </div>
                 </div>
@@ -734,16 +734,50 @@ async function addToCart(productId, btn) {
     }
 }
 
-// ── Wishlist toggle ────────────────────────────────────────
-document.querySelectorAll('.wishlist-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const liked = btn.textContent.trim() === '♥';
-        btn.textContent = liked ? '♡' : '♥';
-        btn.style.background   = liked ? '' : 'var(--rose)';
-        btn.style.borderColor  = liked ? '' : 'var(--rose)';
-        btn.style.transform    = liked ? '' : 'scale(1.2)';
-        setTimeout(() => { btn.style.transform = ''; }, 250);
-    });
+// ── Wishlist toggle (appel API réel) ───────────────────────
+function toggleWish(btn, productId) {
+    btn.disabled = true;
+    fetch('/wishlist/toggle', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({ product_id: productId })
+    })
+    .then(r => r.json())
+    .then(data => {
+        btn.textContent = data.added ? '♥' : '♡';
+        btn.style.background  = data.added ? 'var(--rose)' : '';
+        btn.style.borderColor = data.added ? 'var(--rose)' : '';
+        btn.disabled = false;
+        // Mettre à jour le badge wishlist navbar
+        const wishBadge = document.getElementById('wish-badge');
+        if (wishBadge) {
+            wishBadge.style.display = data.count > 0 ? 'flex' : 'none';
+            wishBadge.textContent = data.count;
+        }
+    })
+    .catch(() => { btn.disabled = false; });
+}
+
+// Initialiser les cœurs au chargement
+document.addEventListener('DOMContentLoaded', function() {
+    @auth
+    fetch('/wishlist/ids')
+        .then(r => r.json())
+        .then(ids => {
+            document.querySelectorAll('.wishlist-btn[onclick]').forEach(btn => {
+                const match = btn.getAttribute('onclick').match(/\d+/);
+                if (match && ids.includes(parseInt(match[0]))) {
+                    btn.textContent = '♥';
+                    btn.style.background  = 'var(--rose)';
+                    btn.style.borderColor = 'var(--rose)';
+                }
+            });
+        })
+        .catch(() => {});
+    @endauth
 });
 
 // ── Newsletter form ────────────────────────────────────────

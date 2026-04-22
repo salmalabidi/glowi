@@ -56,12 +56,12 @@ class ProductController extends Controller
             default:           $query->latest(); break;
         }
 
-        $filteredCount = $query->count(); // ✅ compter AVANT paginate
-        $products = $query->paginate(12);
-        $totalCount = Product::where('active', true)->where('stock', '>', 0)->count();
-        $categories = Category::withCount(['products' => fn($q) => $q->where('active', true)->where('stock', '>', 0)])->get();
-        $productTypes = Product::where('active', true)->where('stock', '>', 0)->distinct()->pluck('product_type')->filter()->values();
-        $brands = Product::where('active', true)->where('stock', '>', 0)->distinct()->pluck('brand')->filter()->sort()->values();
+        $filteredCount = $query->count();
+        $products      = $query->paginate(12);
+        $totalCount    = Product::where('active', true)->where('stock', '>', 0)->count();
+        $categories    = Category::withCount(['products' => fn($q) => $q->where('active', true)->where('stock', '>', 0)])->get();
+        $productTypes  = Product::where('active', true)->where('stock', '>', 0)->distinct()->pluck('product_type')->filter()->values();
+        $brands        = Product::where('active', true)->where('stock', '>', 0)->distinct()->pluck('brand')->filter()->sort()->values();
 
         // AJAX request → return partial HTML + count
         if ($request->ajax() || $request->wantsJson()) {
@@ -78,7 +78,6 @@ class ProductController extends Controller
             ->where('active', true)
             ->where('stock', '>', 0);
 
-        // ✅ FIX: accepter ?q= (navbar) ET ?search= (catalogue)
         $searchTerm = $request->q ?? $request->search;
         if ($searchTerm) {
             $s = $searchTerm;
@@ -108,11 +107,39 @@ class ProductController extends Controller
             default:           $query->latest(); break;
         }
 
-        $count = $query->count();
+        $count    = $query->count();
         $products = $query->paginate(12);
-        $html = view('products.partials.grid', compact('products'))->render();
+        $html     = view('products.partials.grid', compact('products'))->render();
 
         return response()->json(['html' => $html, 'count' => $count]);
+    }
+
+    // ✅ NOUVEAU : recherche live pour la navbar (retourne un tableau JSON de produits)
+    public function navSearch(Request $request)
+    {
+        $q = $request->q;
+        if (!$q || strlen($q) < 2) {
+            return response()->json([]);
+        }
+
+        $products = Product::with('category')
+            ->where('active', true)
+            ->where('stock', '>', 0)
+            ->where(function($query) use ($q) {
+                $query->where('name', 'like', "%$q%")
+                      ->orWhere('brand', 'like', "%$q%")
+                      ->orWhere('product_type', 'like', "%$q%");
+            })
+            ->limit(6)
+            ->get();
+
+        return response()->json($products->map(fn($p) => [
+            'id'        => $p->id,
+            'name'      => $p->name,
+            'brand'     => $p->brand,
+            'price'     => $p->price,
+            'image_url' => $p->image ? asset('storage/' . $p->image) : null,
+        ]));
     }
 
     public function show(Product $product)
