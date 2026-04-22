@@ -135,40 +135,16 @@ class ProductController extends Controller
                     ->limit(8)
                     ->get();
 
-              $results = $products->map(function ($p) {
-
-    $imagePath = $p->image ?? '';
-
-    if ($imagePath) {
-        if (\Illuminate\Support\Str::startsWith($imagePath, ['http://', 'https://'])) {
-            $imageUrl = $imagePath;
-        } elseif (\Illuminate\Support\Str::startsWith($imagePath, ['Images/', 'images/'])) {
-            $imageUrl = asset($imagePath);
-        } else {
-            $folder = match ($p->category->slug ?? '') {
-                'accessoires' => 'ACCESSOIRES',
-                'maquillage' => 'MAQUILLAGE',
-                'skincare' => 'SKINCARE',
-                default => '',
-            };
-
-            $imageUrl = $folder
-                ? asset('Images/' . $folder . '/' . ltrim($imagePath, '/'))
-                : asset('Images/' . ltrim($imagePath, '/'));
-        }
-    } else {
-        $imageUrl = null;
-    }
-
-    return [
-        'id' => $p->id,
-        'name' => $p->name,
-        'brand' => $p->brand ?? '',
-        'price' => (float) $p->price,
-        'image_url' => $imageUrl,
-        'category' => optional($p->category)->name ?? '',
-    ];
-});
+                $results = $products->map(function ($p) {
+                    return [
+                        'id' => $p->id,
+                        'name' => $p->name,
+                        'brand' => $p->brand ?? '',
+                        'price' => (float) $p->price,
+                        'image_url' => $p->image ? asset('storage/' . $p->image) : null,
+                        'category' => optional($p->category)->name ?? '',
+                    ];
+                })->values();
 
                 return response()->json($results);
             } catch (\Exception $e) {

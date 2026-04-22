@@ -3,42 +3,54 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Order;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $query = Order::with('user');
+
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('id', $search)
+                  ->orWhereHas('user', fn($u) => $u->where('name', 'like', "%{$search}%"));
+            });
+        }
+
+        if ($status = $request->input('status')) {
+            $query->where('status', $status);
+        }
+
+        $orders = $query->latest()->paginate(20)->withQueryString();
+
+        return view('admin.orders.index', compact('orders'));
     }
 
-    public function create()
+    public function show(Order $order)
     {
-        //
+        $order->load('user', 'items.product');
+        return view('admin.orders.show', compact('order'));
     }
 
-    public function store(Request $request)
+    public function update(Request $request, Order $order)
     {
-        //
+        $request->validate([
+            'status' => 'required|in:pending,validated,cancelled',
+        ]);
+
+        $order->update(['status' => $request->status]);
+
+        return back()->with('success', 'Statut de la commande mis à jour.');
     }
 
-    public function show(string $id)
+    public function destroy(Order $order)
     {
-        //
-    }
+        $order->items()->delete();
+        $order->delete();
 
-    public function edit(string $id)
-    {
-        //
-    }
-
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    public function destroy(string $id)
-    {
-        //
+        return redirect()->route('admin.orders.index')
+            ->with('success', 'Commande supprimée.');
     }
 }
