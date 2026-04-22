@@ -37,22 +37,8 @@
             overflow-x: hidden;
         }
 
-        a, button, select, textarea {
+        a, button, select, input, textarea {
             cursor: none;
-        }
-
-        input[type="text"],
-        input[type="search"],
-        input[type="email"],
-        input[type="password"],
-        input[type="number"],
-        textarea {
-            cursor: text !important;
-            caret-color: var(--rose);
-        }
-
-        input[type="range"] {
-            cursor: pointer !important;
         }
 
         /* CURSOR */
@@ -101,15 +87,15 @@
         }
 
         /* NAVBAR */
-        nav {
+        #navbar {
             position: fixed;
             top: 0; left: 0; right: 0;
             z-index: 1300;
             height: 78px;
             padding: 0 30px;
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
+            display: flex;
             align-items: center;
+            justify-content: space-between;
             background: rgba(26, 15, 20, 0.84);
             backdrop-filter: blur(18px) saturate(1.35);
             -webkit-backdrop-filter: blur(18px) saturate(1.35);
@@ -117,17 +103,17 @@
             transition: transform 0.4s ease, background 0.35s ease, box-shadow 0.35s ease, height 0.35s ease;
         }
 
-        nav.scrolled {
+        #navbar.scrolled {
             background: rgba(26, 15, 20, 0.94);
             box-shadow: 0 14px 40px rgba(0,0,0,0.18);
         }
 
-        nav.nav-hidden { transform: translateY(-100%); }
-        nav.nav-compact { height: 72px; }
+        #navbar.nav-hidden { transform: translateY(-100%); }
+        #navbar.nav-compact { height: 72px; }
 
         .nav-left {
             display: flex; align-items: center; gap: 16px;
-            justify-content: flex-start;
+            min-width: 210px;
         }
 
         .back-btn {
@@ -166,9 +152,9 @@
 
         .nav-center {
             display: flex; align-items: center; gap: 10px;
-            justify-content: center;
+            position: absolute; left: 50%; transform: translateX(-50%);
             background: transparent;
-            z-index: 1;
+            z-index: 1; /* ✅ intentionnellement bas — search wrap est z:9999 */
         }
 
         .nav-link {
@@ -245,16 +231,16 @@
             display: flex;
             align-items: center;
             gap: 14px;
-            justify-content: flex-end;
             position: relative;
             z-index: 1500;
         }
 
-        /* SEARCH — bouton icône + overlay plein écran */
+        /* SEARCH INLINE */
         .nav-search-wrap {
             display: flex;
             align-items: center;
             position: relative;
+            z-index: 9999; /* ✅ FIX: au-dessus de tous les éléments nav */
         }
 
         .nav-search-btn {
@@ -295,161 +281,68 @@
             stroke: currentColor; fill: none; stroke-width: 1.8;
             transition: transform 0.25s ease;
         }
-.nav-wishlist {
-    position: relative;
-    color: rgba(255,255,255,0.82);
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.25s ease, color 0.25s ease;
-}
 
-.nav-wishlist:hover {
-    color: var(--gold);
-    transform: translateY(-2px);
-}
-
-.wishlist-icon-wrap {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
-    transition: transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-}
-
-.nav-wishlist:hover .wishlist-icon-wrap {
-    background: rgba(200,116,138,0.14);
-    border-color: rgba(200,116,138,0.28);
-    box-shadow: 0 12px 26px rgba(200,116,138,0.16);
-    transform: scale(1.06);
-}
-
-.nav-wishlist svg {
-    width: 20px;
-    height: 20px;
-    stroke: currentColor;
-    fill: none;
-    stroke-width: 1.8;
-    transition: transform 0.25s ease;
-}
-
-.nav-wishlist:hover svg {
-    transform: scale(1.08);
-}
-
-.wishlist-badge {
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    background: linear-gradient(135deg, var(--rose), var(--gold));
-    color: #fff;
-    font-size: 0.62rem;
-    font-weight: 600;
-    min-width: 18px;
-    height: 18px;
-    padding: 0 5px;
-    border-radius: 999px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 8px 16px rgba(200,116,138,0.28);
-    animation: pulse-badge 2s infinite;
-}
-
-.wishlist-badge.bump {
-    animation: cartBadgeBump 0.35s ease;
-}
         .nav-search-btn:hover svg { transform: scale(1.08) rotate(-6deg); }
 
-        /* Overlay de recherche — s'affiche SOUS la navbar, pleine largeur */
-        .search-overlay {
-            position: fixed;
-            top: 78px; /* hauteur navbar */
-            left: 0; right: 0;
-            background: rgba(20, 10, 16, 0.97);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(201,169,110,0.15);
-            z-index: 1290;
-            padding: 20px 40px 24px;
-            display: none;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.35);
-        }
-
-        .search-overlay.open {
-            display: block;
-            animation: searchOverlayIn 0.22s ease;
-        }
-
-        @keyframes searchOverlayIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-
-        .search-overlay-inner {
-            max-width: 680px;
-            margin: 0 auto;
-            position: relative;
-        }
-
-        .search-overlay-icon {
+        .nav-search-input-wrap {
             position: absolute;
-            left: 18px; top: 50%;
+            right: 50px;
+            top: 50%;
             transform: translateY(-50%);
-            width: 18px; height: 18px;
-            stroke: var(--rose); fill: none; stroke-width: 1.8;
+            width: 0;
+            overflow: visible; /* ✅ FIX: était hidden, empêchait l'affichage */
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+            opacity: 0;
             pointer-events: none;
-            opacity: 0.7;
+            z-index: 9999; /* ✅ FIX: au-dessus des liens nav */
         }
 
-        .search-overlay-input {
+        .nav-search-input-wrap.open {
+            width: 280px; /* légèrement élargi pour plus de confort */
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .nav-search-input {
             width: 100%;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(201,169,110,0.25);
-            border-radius: 14px;
-            padding: 14px 18px 14px 50px;
+            background: rgba(26,15,20,0.95);
+            border: 1px solid rgba(201,169,110,0.3);
+            border-right: none;
+            border-radius: 999px 0 0 999px;
+            padding: 10px 18px;
             color: #fff;
             font-family: 'Jost', sans-serif;
-            font-size: 0.92rem;
-            letter-spacing: 0.04em;
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
             outline: none;
-            cursor: text !important;
-            caret-color: var(--rose);
-            transition: border-color 0.25s;
+            transition: border-color 0.3s;
+            /* ✅ FIX: clip au niveau de l'input, pas du wrap */
+            clip-path: inset(0 0 0 0 round 999px 0 0 999px);
         }
 
-        .search-overlay-input::placeholder { color: rgba(255,255,255,0.3); }
-        .search-overlay-input:focus { border-color: rgba(200,116,138,0.5); }
+        .nav-search-input::placeholder { color: rgba(255,255,255,0.35); }
+        .nav-search-input:focus { border-color: rgba(200,116,138,0.5); }
 
-        .search-overlay-close {
-            position: absolute;
-            right: 14px; top: 50%;
-            transform: translateY(-50%);
-            background: none; border: none;
-            color: rgba(255,255,255,0.4);
-            font-size: 1.2rem;
-            cursor: none;
-            transition: color 0.2s;
-            line-height: 1;
-        }
-        .search-overlay-close:hover { color: var(--rose); }
-
-        /* Résultats — sous l'input dans l'overlay */
         .search-results-dropdown {
-            margin-top: 12px;
-            max-height: 340px;
+            position: absolute;
+            top: calc(100% + 12px);
+            right: 0;
+            width: 340px;
+            max-height: 380px;
             overflow-y: auto;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(201,169,110,0.12);
+            background: rgba(26,15,20,0.98);
+            border: 1px solid rgba(201,169,110,0.2);
             border-radius: 14px;
+            z-index: 99999; /* ✅ FIX: au-dessus de tout */
+            box-shadow: 0 18px 50px rgba(0,0,0,0.4);
+            backdrop-filter: blur(20px);
             display: none;
         }
 
-        .search-results-dropdown.show { display: block; }
+        .search-results-dropdown.show {
+            display: block;
+            animation: fadeSlide 0.2s ease;
+        }
 
         @keyframes fadeSlide {
             from { opacity: 0; transform: translateY(-6px); }
@@ -465,7 +358,7 @@
         }
 
         .search-result-item:last-child { border-bottom: none; }
-        .search-result-item:hover { background: rgba(255,255,255,0.05); }
+        .search-result-item:hover { background: rgba(255,255,255,0.04); }
 
         .search-result-img {
             width: 42px; height: 42px;
@@ -662,8 +555,8 @@
             transition: top 0.4s ease;
         }
 
-        nav.nav-compact ~ .marquee-bar { top: 72px; }
-        nav.nav-hidden ~ .marquee-bar { top: 0; }
+        #navbar.nav-compact ~ .marquee-bar { top: 72px; }
+        #navbar.nav-hidden ~ .marquee-bar { top: 0; }
 
         @keyframes gradientMove { to { background-position: 200% center; } }
 
@@ -781,7 +674,7 @@
         .reveal-up.show { opacity: 1; transform: translateY(0); }
 
         @media (max-width: 900px) {
-            nav { padding: 0 18px; }
+            #navbar { padding: 0 18px; }
             .nav-left { min-width: auto; gap: 10px; }
             .back-btn { padding: 8px 12px; font-size: 0.64rem; letter-spacing: 0.1em; }
             .back-btn span:last-child { display: none; }
@@ -790,8 +683,8 @@
             main { padding-top: 120px; }
             footer { padding: 58px 24px 36px; }
             .footer-grid { grid-template-columns: 1fr; gap: 28px; }
-            .search-overlay { padding: 16px 18px 20px; }
-            .search-results-dropdown { max-height: 260px; }
+            .nav-search-input-wrap.open { width: 160px; }
+            .search-results-dropdown { width: 280px; right: -20px; }
         }
     </style>
 </head>
@@ -835,33 +728,36 @@
 
         <div class="nav-right">
             <div class="nav-search-wrap" id="searchWrap">
+                <div class="nav-search-input-wrap" id="searchInputWrap">
+                    <input
+                        type="text"
+                        class="nav-search-input"
+                        id="navSearchInput"
+                        placeholder="Rechercher un produit..."
+                        autocomplete="off"
+                    >
+                </div>
                 <button class="nav-search-btn" id="searchToggleBtn" aria-label="Rechercher" type="button">
                     <svg viewBox="0 0 24 24" fill="none">
                         <path d="M21 21L16.65 16.65" stroke-linecap="round" stroke-linejoin="round"/>
                         <path d="M10.8 18.1C14.8317 18.1 18.1 14.8317 18.1 10.8C18.1 6.76832 14.8317 3.5 10.8 3.5C6.76832 3.5 3.5 6.76832 3.5 10.8C3.5 14.8317 6.76832 18.1 10.8 18.1Z"/>
                     </svg>
                 </button>
+                <div class="search-results-dropdown" id="searchResultsDropdown"></div>
             </div>
 
             @auth
                 {{-- WISHLIST --}}
-               <a href="{{ route('wishlist.index') }}" class="nav-wishlist" aria-label="Wishlist">
-    <span class="wishlist-icon-wrap">
-        <svg viewBox="0 0 24 24">
-            <path d="M12 21s-6.7-4.35-9.33-8.09C.9 10.36 1.6 6.6 4.92 5.28c2.1-.84 4.36-.19 5.58 1.57 1.22-1.76 3.48-2.41 5.58-1.57 3.32 1.32 4.02 5.08 2.25 7.63C18.7 16.65 12 21 12 21z"/>
-        </svg>
-    </span>
-
-    @php
-        $wishlistCount = count(session('wishlist', []));
-    @endphp
-
-    @if($wishlistCount > 0)
-        <span class="wishlist-badge" id="wishlist-badge">{{ $wishlistCount }}</span>
-    @else
-        <span class="wishlist-badge" id="wishlist-badge" style="display:none;">0</span>
-    @endif
-</a>
+                <a href="{{ route('wishlist.index') }}" class="nav-cart" aria-label="Wishlist" title="Ma wishlist">
+                    <span class="cart-icon-wrap">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                        </svg>
+                    </span>
+                    <span class="cart-badge" id="wish-badge" style="{{ Auth::check() ? '' : 'display:none' }}">
+                        ♡
+                    </span>
+                </a>
 
                 {{-- PANIER --}}
                 <a href="{{ route('cart.index') }}" class="nav-cart" aria-label="Panier">
@@ -903,25 +799,6 @@
             @endauth
         </div>
     </nav>
-
-    {{-- SEARCH OVERLAY — s'affiche sous la navbar, hors du flux nav --}}
-    <div class="search-overlay" id="searchOverlay">
-        <div class="search-overlay-inner">
-            <svg class="search-overlay-icon" viewBox="0 0 24 24">
-                <path d="M21 21L16.65 16.65" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M10.8 18.1C14.8317 18.1 18.1 14.8317 18.1 10.8C18.1 6.76832 14.8317 3.5 10.8 3.5C6.76832 3.5 3.5 6.76832 3.5 10.8C3.5 14.8317 6.76832 18.1 10.8 18.1Z"/>
-            </svg>
-            <input
-                type="text"
-                class="search-overlay-input"
-                id="navSearchInput"
-                placeholder="Rechercher un produit, une marque..."
-                autocomplete="off"
-            >
-            <button class="search-overlay-close" id="searchCloseBtn" type="button">✕</button>
-            <div class="search-results-dropdown" id="searchResultsDropdown"></div>
-        </div>
-    </div>
 
     <div class="marquee-bar" id="marqueeBar">
         <div class="marquee-inner">
@@ -1120,27 +997,28 @@
             });
         }
 
-        // ── RECHERCHE NAVBAR (overlay) ───────────────────────────────────────
-        const searchToggleBtn   = document.getElementById('searchToggleBtn');
-        const searchCloseBtn    = document.getElementById('searchCloseBtn');
-        const searchOverlay     = document.getElementById('searchOverlay');
-        const navSearchInput    = document.getElementById('navSearchInput');
-        const searchResultsDrop = document.getElementById('searchResultsDropdown');
-        let _navSearchTimeout   = null;
+        // ── RECHERCHE NAVBAR ─────────────────────────────────────────────────
+        const searchToggleBtn      = document.getElementById('searchToggleBtn');
+        const searchInputWrap      = document.getElementById('searchInputWrap');
+        const navSearchInput       = document.getElementById('navSearchInput');
+        const searchResultsDrop    = document.getElementById('searchResultsDropdown');
+        let searchOpen        = false;
+        let _navSearchTimeout = null;
 
-        function openSearch() {
-            searchOverlay.classList.add('open');
-            setTimeout(() => navSearchInput && navSearchInput.focus(), 80);
+        if (searchToggleBtn) {
+            searchToggleBtn.addEventListener('click', e => {
+                e.stopPropagation();
+                searchOpen = !searchOpen;
+                if (searchOpen) {
+                    searchInputWrap.classList.add('open');
+                    setTimeout(() => navSearchInput.focus(), 350);
+                } else {
+                    searchInputWrap.classList.remove('open');
+                    searchResultsDrop.classList.remove('show');
+                    navSearchInput.value = '';
+                }
+            });
         }
-
-        function closeSearch() {
-            searchOverlay.classList.remove('open');
-            searchResultsDrop.classList.remove('show');
-            if (navSearchInput) navSearchInput.value = '';
-        }
-
-        if (searchToggleBtn) searchToggleBtn.addEventListener('click', e => { e.stopPropagation(); openSearch(); });
-        if (searchCloseBtn)  searchCloseBtn.addEventListener('click',  e => { e.stopPropagation(); closeSearch(); });
 
         if (navSearchInput) {
             navSearchInput.addEventListener('input', function () {
@@ -1151,16 +1029,18 @@
                 searchResultsDrop.classList.add('show');
                 _navSearchTimeout = setTimeout(() => doNavSearch(q), 300);
             });
-            navSearchInput.addEventListener('keydown', e => { if (e.key === 'Escape') closeSearch(); });
+
+            navSearchInput.addEventListener('keydown', e => {
+                if (e.key === 'Escape') searchToggleBtn.click();
+            });
         }
 
         async function doNavSearch(q) {
             try {
-                const res  = await fetch(`/products/nav-search?q=${encodeURIComponent(q)}`);
+                const res  = await fetch(`/products/search?q=${encodeURIComponent(q)}`);
                 const data = await res.json();
                 if (!data.length) {
                     searchResultsDrop.innerHTML = '<div class="search-no-results">Aucun résultat trouvé</div>';
-                    searchResultsDrop.classList.add('show');
                     return;
                 }
                 searchResultsDrop.innerHTML = data.map(p => `
@@ -1170,15 +1050,13 @@
                              onerror="this.src='https://via.placeholder.com/42x42/f5e6ea/c8748a?text=G'">
                         <div class="search-result-info">
                             <div class="search-result-name">${escHtml(p.name)}</div>
-                            <div class="search-result-brand">${escHtml(p.brand || '')}</div>
+                            <div class="search-result-brand">${escHtml(p.brand || p.category || '')}</div>
                         </div>
                         <div class="search-result-price">${parseFloat(p.price).toFixed(2)} TND</div>
                     </a>
                 `).join('');
-                searchResultsDrop.classList.add('show');
             } catch (_) {
                 searchResultsDrop.innerHTML = '<div class="search-no-results">Erreur de connexion</div>';
-                searchResultsDrop.classList.add('show');
             }
         }
 
@@ -1187,10 +1065,12 @@
         }
 
         document.addEventListener('click', e => {
-            if (searchOverlay && searchOverlay.classList.contains('open')) {
-                if (!searchOverlay.contains(e.target) && e.target !== searchToggleBtn) {
-                    closeSearch();
-                }
+            const wrap = document.getElementById('searchWrap');
+            if (wrap && !wrap.contains(e.target)) {
+                searchInputWrap && searchInputWrap.classList.remove('open');
+                searchResultsDrop && searchResultsDrop.classList.remove('show');
+                navSearchInput && (navSearchInput.value = '');
+                searchOpen = false;
             }
         });
 
@@ -1207,27 +1087,6 @@
                 badge.classList.add('bump');
             }
         };
-        function updateWishlistBadge(count, animate = true) {
-    const badge = document.getElementById('wishlist-badge');
-    if (!badge) return;
-
-    const safeCount = Math.max(0, parseInt(count || 0));
-
-    if (safeCount <= 0) {
-        badge.textContent = 0;
-        badge.style.display = 'none';
-        return;
-    }
-
-    badge.style.display = 'flex';
-    badge.textContent = safeCount;
-
-    if (animate) {
-        badge.classList.remove('bump');
-        void badge.offsetWidth;
-        badge.classList.add('bump');
-    }
-}
 
         // ── ANIMATIONS AU SCROLL ─────────────────────────────────────────────
         document.addEventListener('DOMContentLoaded', () => {
