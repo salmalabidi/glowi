@@ -433,8 +433,19 @@
     position: absolute;
     left: 0; right: 0;
     height: 4px;
-    background: rgba(200,116,138,0.2);
+    background: rgba(200,116,138,0.18);
     border-radius: 2px;
+    z-index: 0;
+}
+
+.range-track {
+    position: absolute;
+    height: 4px;
+    background: linear-gradient(90deg, var(--rose), #d98aa0);
+    border-radius: 2px;
+    z-index: 1;
+    pointer-events: none;
+    transition: left 0.05s, width 0.05s;
 }
 
 .price-range input[type=range] {
@@ -1021,8 +1032,8 @@
                     <div class="sidebar-title">Prix</div>
 
                     <div class="price-range">
-                        {{-- ✅ FIX: double slider min + max pour filtrage réel --}}
-                        <div class="price-range-dual">
+                        <div class="price-range-dual" id="priceRangeDual">
+                            <div class="range-track" id="rangeTrack"></div>
                             <input
                                 type="range"
                                 min="0"
@@ -1114,7 +1125,7 @@
                                 <a href="{{ route('products.show', $product) }}" class="overlay-btn">Voir</a>
 
                                 @auth
-                                    <button class="wishlist-btn" onclick="toggleWish(this, {{ $product->id }})">♡</button>
+                                    <button class="wishlist-btn" onclick="toggleWishlist({{ $product->id }}, this)">♡</button>
                                 @endauth
                             </div>
                         </div>
@@ -1161,16 +1172,16 @@ const searchInput = document.getElementById('search-input');
 const loader = document.getElementById('search-loader');
 const grid = document.getElementById('products-grid');
 
-// ✅ FIX: Fonction double slider prix
+// ✅ Double slider prix — track colorée via div réelle (pas ::before)
 function updatePriceRange() {
     const minSlider = document.getElementById('price-range-min');
     const maxSlider = document.getElementById('price-range-max');
+    const track     = document.getElementById('rangeTrack');
     if (!minSlider || !maxSlider) return;
 
     let minVal = parseInt(minSlider.value);
     let maxVal = parseInt(maxSlider.value);
 
-    // Empêcher le croisement des deux curseurs
     if (minVal >= maxVal) {
         minVal = maxVal - 5;
         if (minVal < 0) minVal = 0;
@@ -1180,35 +1191,35 @@ function updatePriceRange() {
     document.getElementById('price-val-min').textContent = minVal + ' TND';
     document.getElementById('price-val-max').textContent = maxVal + ' TND';
 
-    // Colorier la track entre les deux curseurs
-    const percent1 = (minVal / 200) * 100;
-    const percent2 = (maxVal / 200) * 100;
-    const track = minSlider.closest('.price-range-dual');
     if (track) {
-        track.style.setProperty('--p1', percent1 + '%');
-        track.style.setProperty('--p2', percent2 + '%');
+        const pct1 = (minVal / 200) * 100;
+        const pct2 = (maxVal / 200) * 100;
+        track.style.left  = pct1 + '%';
+        track.style.width = (pct2 - pct1) + '%';
     }
 
     clearTimeout(window._priceT);
     window._priceT = setTimeout(applyFilters, 500);
 }
 
-// Initialiser le slider au chargement
 document.addEventListener('DOMContentLoaded', function() {
     updatePriceRange();
-    // Colorier dynamiquement la track via pseudo-élément
-    document.querySelectorAll('.price-range-dual').forEach(wrap => {
-        const style = document.createElement('style');
-        style.id = 'price-track-style';
-        document.head.appendChild(style);
-        const updateStyle = () => {
-            const p1 = wrap.style.getPropertyValue('--p1') || '0%';
-            const p2 = wrap.style.getPropertyValue('--p2') || '100%';
-            style.textContent = `.price-range-dual input[type=range] { background: linear-gradient(to right, rgba(200,116,138,0.15) ${p1}, var(--rose) ${p1}, var(--rose) ${p2}, rgba(200,116,138,0.15) ${p2}); }`;
-        };
-        wrap.addEventListener('input', updateStyle);
-        updateStyle();
-    });
+
+    // Initialiser l'état des cœurs : remplir ♥ pour les produits déjà dans la wishlist
+    @auth
+    fetch('/wishlist/ids')
+        .then(r => r.json())
+        .then(ids => {
+            document.querySelectorAll('.wishlist-btn').forEach(btn => {
+                const match = btn.getAttribute('onclick').match(/\d+/);
+                if (match && ids.includes(parseInt(match[0]))) {
+                    btn.textContent = '♥';
+                    btn.classList.add('wishlisted');
+                }
+            });
+        })
+        .catch(() => {});
+    @endauth
 });
 
 if (searchInput) {
@@ -1304,31 +1315,41 @@ function addToCart(productId, btn) {
     });
 }
 
-function toggleWish(btn, productId) {
-    btn.disabled = true;
-
+function toggleWishlist(productId, btn) {
     fetch('/wishlist/toggle', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
         },
         body: JSON.stringify({ product_id: productId })
     })
-    .then(r => r.json())
-    .then(data => {
-        btn.textContent = data.added ? '♥' : '♡';
-        btn.classList.toggle('wishlisted', data.added);
-        btn.disabled = false;
+    .then(async (response) => {
+        if (!response.ok) {
+            throw new Error('Erreur wishlist');
+        }
 
-        // Mettre à jour le badge wishlist dans la navbar
-        const wishBadge = document.getElementById('wish-badge');
-        if (wishBadge) {
-            wishBadge.style.display = data.count > 0 ? 'flex' : 'none';
-            wishBadge.textContent = data.count > 0 ? data.count : '♡';
+        const data = await response.json();
+
+        btn.textContent = data.added ? '♥' : '♡';
+
+        if (data.added) {
+            btn.style.background = 'var(--rose)';
+            btn.style.borderColor = 'var(--rose)';
+        } else {
+            btn.style.background = '';
+            btn.style.borderColor = '';
+        }
+
+        if (typeof updateWishlistBadge === 'function') {
+            updateWishlistBadge(data.count);
         }
     })
-    .catch(() => { btn.disabled = false; });
+    .catch(() => {
+        alert('Impossible de mettre à jour la wishlist.');
+    });
 }
 
 document.addEventListener('DOMContentLoaded', function () {

@@ -2,55 +2,62 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Wishlist;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class WishlistController extends Controller
 {
     public function index()
     {
-        $items = Wishlist::with('product.category')
-            ->where('user_id', auth()->id())
-            ->latest()
-            ->get();
+        $wishlistIds = session()->get('wishlist', []);
 
-        return view('wishlist.index', compact('items'));
+        $wishlist = collect($wishlistIds)
+            ->map(function ($productId) {
+                return Product::with('category')->find($productId);
+            })
+            ->filter()
+            ->values();
+
+        return view('wishlist.index', [
+            'wishlist' => $wishlist,
+        ]);
     }
 
     public function toggle(Request $request)
     {
-        $request->validate(['product_id' => 'required|exists:products,id']);
+        $data = $request->validate([
+            'product_id' => ['required', 'exists:products,id'],
+        ]);
 
-        $existing = Wishlist::where('user_id', auth()->id())
-            ->where('product_id', $request->product_id)
-            ->first();
+        $wishlist = session()->get('wishlist', []);
 
-        if ($existing) {
-            $existing->delete();
+        if (in_array($data['product_id'], $wishlist)) {
+            $wishlist = array_values(array_filter($wishlist, fn ($id) => $id != $data['product_id']));
             $added = false;
         } else {
-            Wishlist::create([
-                'user_id'    => auth()->id(),
-                'product_id' => $request->product_id,
-            ]);
+            $wishlist[] = $data['product_id'];
             $added = true;
         }
 
-        $count = Wishlist::where('user_id', auth()->id())->count();
+        session()->put('wishlist', $wishlist);
 
-        return response()->json(['added' => $added, 'count' => $count]);
+        return response()->json([
+            'success' => true,
+            'added' => $added,
+            'count' => count($wishlist),
+        ]);
     }
 
-    public function remove(Wishlist $wishlist)
+    public function remove($productId)
     {
-        abort_if($wishlist->user_id !== auth()->id(), 403);
-        $wishlist->delete();
-        return back()->with('success', 'Produit retiré de la wishlist.');
-    }
+        $wishlist = session()->get('wishlist', []);
+        $wishlist = array_values(array_filter($wishlist, fn ($id) => $id != $productId));
 
-    public function ids()
-    {
-        $ids = Wishlist::where('user_id', auth()->id())->pluck('product_id');
-        return response()->json($ids);
+        session()->put('wishlist', $wishlist);
+
+        return response()->json([
+            'success' => true,
+            'count' => count($wishlist),
+        ]);
     }
 }
