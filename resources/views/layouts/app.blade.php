@@ -37,29 +37,53 @@
             overflow-x: hidden;
         }
 
-        a, button, select, input { cursor: none; }
+        a, button, select, input, textarea {
+            cursor: none;
+        }
 
         /* CURSOR */
         #cursor {
-            width: 12px; height: 12px;
+            width: 12px;
+            height: 12px;
             background: var(--rose);
             border-radius: 50%;
-            position: fixed; top: 0; left: 0;
-            pointer-events: none; z-index: 99999;
-            transform: translate(-50%, -50%);
-            transition: transform 0.1s, width 0.3s, height 0.3s, background 0.3s;
-            mix-blend-mode: multiply;
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 99999;
+            transform: translate3d(-100px, -100px, 0);
+            transition: opacity 0.2s ease, background 0.2s ease;
+            opacity: 1;
+            will-change: transform;
         }
 
         #cursor-ring {
-            width: 36px; height: 36px;
+            width: 36px;
+            height: 36px;
             border: 1.5px solid var(--rose);
             border-radius: 50%;
-            position: fixed; top: 0; left: 0;
-            pointer-events: none; z-index: 99998;
-            transform: translate(-50%, -50%);
-            transition: transform 0.15s ease, width 0.3s, height 0.3s, opacity 0.3s;
-            opacity: 0.6;
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 99998;
+            transform: translate3d(-100px, -100px, 0);
+            transition: opacity 0.2s ease, border-color 0.2s ease;
+            opacity: 0.55;
+            will-change: transform;
+        }
+
+        @media (max-width: 900px), (hover: none), (pointer: coarse) {
+            body,
+            a, button, input, select, textarea {
+                cursor: auto !important;
+            }
+
+            #cursor,
+            #cursor-ring {
+                display: none !important;
+            }
         }
 
         /* NAVBAR */
@@ -203,15 +227,15 @@
         .dropdown-menu a:hover { color: var(--gold); padding-left: 26px; background: rgba(255,255,255,0.03); }
         .dropdown-menu a + a { border-top: 1px solid rgba(255,255,255,0.05); }
 
-        .nav-right { 
-            display: flex; 
-            align-items: center; 
+        .nav-right {
+            display: flex;
+            align-items: center;
             gap: 14px;
             position: relative;
             z-index: 1500;
         }
 
-        /* ========== SEARCH INLINE - CORRIGÉ Z-INDEX ========== */
+        /* SEARCH INLINE */
         .nav-search-wrap {
             display: flex;
             align-items: center;
@@ -260,7 +284,6 @@
 
         .nav-search-btn:hover svg { transform: scale(1.08) rotate(-6deg); }
 
-        /* Search input sliding */
         .nav-search-input-wrap {
             position: absolute;
             right: 50px;
@@ -298,7 +321,6 @@
         .nav-search-input::placeholder { color: rgba(255,255,255,0.35); }
         .nav-search-input:focus { border-color: rgba(200,116,138,0.5); }
 
-        /* Search results dropdown - CORRIGÉ Z-INDEX */
         .search-results-dropdown {
             position: absolute;
             top: calc(100% + 12px);
@@ -315,9 +337,9 @@
             display: none;
         }
 
-        .search-results-dropdown.show { 
-            display: block; 
-            animation: fadeSlide 0.2s ease; 
+        .search-results-dropdown.show {
+            display: block;
+            animation: fadeSlide 0.2s ease;
         }
 
         @keyframes fadeSlide {
@@ -410,6 +432,14 @@
             border-radius: 999px; display: flex; align-items: center; justify-content: center;
             box-shadow: 0 8px 16px rgba(200,116,138,0.28);
             animation: pulse-badge 2s infinite;
+        }
+
+        /* WISHLIST BADGE */
+        #wish-badge {
+            background: linear-gradient(135deg, var(--rose), var(--rose-deep));
+            font-size: 0.68rem;
+            padding: 0 6px;
+            animation: none;
         }
 
         @keyframes pulse-badge { 0%,100% { transform: scale(1); } 50% { transform: scale(1.12); } }
@@ -508,7 +538,7 @@
 
         .btn-connexion:hover { background: var(--rose-deep); transform: translateY(-1px); box-shadow: 0 12px 24px rgba(200,116,138,0.18); }
 
-        /* MARQUEE — fixed, suit le scroll */
+        /* MARQUEE */
         .marquee-bar {
             position: fixed;
             top: 78px;
@@ -695,7 +725,6 @@
         </div>
 
         <div class="nav-right">
-            <!-- SEARCH INLINE - CORRIGÉ -->
             <div class="nav-search-wrap" id="searchWrap">
                 <div class="nav-search-input-wrap" id="searchInputWrap">
                     <input
@@ -716,6 +745,19 @@
             </div>
 
             @auth
+                {{-- WISHLIST --}}
+                <a href="{{ route('wishlist.index') }}" class="nav-cart" aria-label="Wishlist" title="Ma wishlist">
+                    <span class="cart-icon-wrap">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                        </svg>
+                    </span>
+                    <span class="cart-badge" id="wish-badge" style="{{ Auth::check() ? '' : 'display:none' }}">
+                        ♡
+                    </span>
+                </a>
+
+                {{-- PANIER --}}
                 <a href="{{ route('cart.index') }}" class="nav-cart" aria-label="Panier">
                     <span class="cart-icon-wrap">
                         <svg viewBox="0 0 24 24">
@@ -742,7 +784,7 @@
                         </div>
                     </button>
                     <div class="user-dropdown" id="userDropdown">
-                        <a href="{{ route('profile.index') }}">Mon profil</a>
+                        <a href="{{ route('profile') }}">Mon profil</a>
                         <a href="{{ route('orders') }}">Mes commandes</a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
@@ -804,7 +846,7 @@
             <div class="footer-col">
                 <h4>Compte</h4>
                 @auth
-                    <a href="{{ route('profile.index') }}">Mon profil</a>
+                    <a href="{{ route('profile') }}">Mon profil</a>
                     <a href="{{ route('orders') }}">Mes commandes</a>
                     <a href="{{ route('cart.index') }}">Mon panier</a>
                 @else
@@ -821,74 +863,148 @@
 
     @yield('scripts')
 
+    {{-- ========== SCRIPTS GLOBAUX ========== --}}
     <script>
-        // CURSOR
-        const cursor = document.getElementById('cursor');
-        const ring = document.getElementById('cursor-ring');
-        let mx = 0, my = 0, rx = 0, ry = 0;
-        document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
-        function animateCursor() {
-            cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
-            rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
-            ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
-            requestAnimationFrame(animateCursor);
-        }
-        animateCursor();
-        document.querySelectorAll('a, button, input, select').forEach(el => {
-            el.addEventListener('mouseenter', () => { cursor.style.transform = 'translate(-50%,-50%) scale(2.5)'; ring.style.opacity = '0.15'; });
-            el.addEventListener('mouseleave', () => { cursor.style.transform = 'translate(-50%,-50%) scale(1)'; ring.style.opacity = '0.6'; });
-        });
+    // Encapsulé dans une IIFE pour éviter les conflits de variables
+    // avec les scripts des pages (ex: searchTimeout, grid, loader, etc.)
+    (function () {
 
-        // NAVBAR + MARQUEE SCROLL SYNC
-        const navbar = document.getElementById('navbar');
+        // ── CURSEUR PERSONNALISÉ ──────────────────────────────────────────────
+        const cursor = document.getElementById('cursor');
+        const ring   = document.getElementById('cursor-ring');
+
+        const enableCustomCursor =
+            window.matchMedia('(hover: hover)').matches &&
+            window.matchMedia('(pointer: fine)').matches &&
+            window.innerWidth > 900;
+
+        if (enableCustomCursor && cursor && ring) {
+            let mouseX = window.innerWidth  / 2;
+            let mouseY = window.innerHeight / 2;
+            let ringX  = mouseX;
+            let ringY  = mouseY;
+
+            function setCursorPos(x, y) {
+                cursor.style.transform = `translate3d(${x - 6}px, ${y - 6}px, 0)`;
+            }
+            function setRingPos(x, y) {
+                ring.style.transform = `translate3d(${x - 18}px, ${y - 18}px, 0)`;
+            }
+
+            setCursorPos(mouseX, mouseY);
+            setRingPos(ringX, ringY);
+
+            function onPointerMove(e) {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                setCursorPos(mouseX, mouseY);
+                try {
+                    sessionStorage.setItem('glowi_cursor_x', mouseX);
+                    sessionStorage.setItem('glowi_cursor_y', mouseY);
+                } catch (_) {}
+            }
+
+            document.addEventListener('mousemove',    onPointerMove, { passive: true });
+            document.addEventListener('pointermove',  onPointerMove, { passive: true });
+
+            (function animateRing() {
+                ringX += (mouseX - ringX) * 0.18;
+                ringY += (mouseY - ringY) * 0.18;
+                setRingPos(ringX, ringY);
+                requestAnimationFrame(animateRing);
+            })();
+
+            window.addEventListener('pageshow', () => {
+                try {
+                    const sx = parseFloat(sessionStorage.getItem('glowi_cursor_x'));
+                    const sy = parseFloat(sessionStorage.getItem('glowi_cursor_y'));
+                    if (!isNaN(sx) && !isNaN(sy)) {
+                        mouseX = ringX = sx;
+                        mouseY = ringY = sy;
+                        setCursorPos(mouseX, mouseY);
+                        setRingPos(ringX, ringY);
+                    }
+                } catch (_) {}
+            });
+
+            document.addEventListener('mousedown', () => {
+                cursor.style.transform = `translate3d(${mouseX - 6}px, ${mouseY - 6}px, 0) scale(1.6)`;
+                ring.style.opacity = '0.18';
+            });
+            document.addEventListener('mouseup', () => {
+                cursor.style.transform = `translate3d(${mouseX - 6}px, ${mouseY - 6}px, 0) scale(1)`;
+                ring.style.opacity = '0.55';
+            });
+
+            document.querySelectorAll('a, button, input, select, textarea').forEach(el => {
+                el.addEventListener('mouseenter', () => {
+                    cursor.style.transform = `translate3d(${mouseX - 6}px, ${mouseY - 6}px, 0) scale(2.15)`;
+                    ring.style.opacity = '0.15';
+                });
+                el.addEventListener('mouseleave', () => {
+                    cursor.style.transform = `translate3d(${mouseX - 6}px, ${mouseY - 6}px, 0) scale(1)`;
+                    ring.style.opacity = '0.55';
+                });
+            });
+        }
+
+        // ── NAVBAR + MARQUEE ─────────────────────────────────────────────────
+        const navbar     = document.getElementById('navbar');
         const marqueeBar = document.getElementById('marqueeBar');
-        let lastScrollY = window.scrollY;
+        let lastScrollY  = window.scrollY;
 
         window.addEventListener('scroll', () => {
-            const currentScroll = window.scrollY;
-            navbar.classList.toggle('scrolled', currentScroll > 20);
-            navbar.classList.toggle('nav-compact', currentScroll > 80);
-            if (currentScroll > 180 && currentScroll > lastScrollY) {
+            const y = window.scrollY;
+            navbar.classList.toggle('scrolled',     y > 20);
+            navbar.classList.toggle('nav-compact',  y > 80);
+
+            if (y > 180 && y > lastScrollY) {
                 navbar.classList.add('nav-hidden');
                 marqueeBar.style.top = '0';
             } else {
                 navbar.classList.remove('nav-hidden');
-                const navH = navbar.classList.contains('nav-compact') ? 72 : 78;
-                marqueeBar.style.top = navH + 'px';
+                marqueeBar.style.top = (navbar.classList.contains('nav-compact') ? 72 : 78) + 'px';
             }
-            lastScrollY = currentScroll;
+            lastScrollY = y;
         });
 
-        // TOAST
+        // ── TOAST ────────────────────────────────────────────────────────────
         const toast = document.getElementById('toast-success');
         if (toast) {
-            setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.4s'; setTimeout(() => toast.remove(), 400); }, 3500);
+            setTimeout(() => {
+                toast.style.transition = 'opacity 0.4s';
+                toast.style.opacity    = '0';
+                setTimeout(() => toast.remove(), 400);
+            }, 3500);
         }
 
-        // USER MENU
-        const userMenu = document.getElementById('userMenu');
+        // ── USER MENU ────────────────────────────────────────────────────────
+        const userMenu        = document.getElementById('userMenu');
         const userMenuTrigger = document.getElementById('userMenuTrigger');
         if (userMenu && userMenuTrigger) {
-            userMenuTrigger.addEventListener('click', function(e) {
+            userMenuTrigger.addEventListener('click', e => {
                 e.stopPropagation();
-                userMenu.classList.toggle('open');
-                userMenuTrigger.setAttribute('aria-expanded', userMenu.classList.contains('open') ? 'true' : 'false');
+                const open = userMenu.classList.toggle('open');
+                userMenuTrigger.setAttribute('aria-expanded', open ? 'true' : 'false');
             });
-            document.addEventListener('click', function(e) {
-                if (!userMenu.contains(e.target)) { userMenu.classList.remove('open'); userMenuTrigger.setAttribute('aria-expanded', 'false'); }
+            document.addEventListener('click', e => {
+                if (!userMenu.contains(e.target)) {
+                    userMenu.classList.remove('open');
+                    userMenuTrigger.setAttribute('aria-expanded', 'false');
+                }
             });
         }
 
-        // SEARCH INLINE - CORRIGÉ
-        const searchToggleBtn = document.getElementById('searchToggleBtn');
-        const searchInputWrap = document.getElementById('searchInputWrap');
-        const navSearchInput = document.getElementById('navSearchInput');
-        const searchResultsDropdown = document.getElementById('searchResultsDropdown');
-        let searchOpen = false;
-        let searchTimeout = null;
+        // ── RECHERCHE NAVBAR ─────────────────────────────────────────────────
+        const searchToggleBtn      = document.getElementById('searchToggleBtn');
+        const searchInputWrap      = document.getElementById('searchInputWrap');
+        const navSearchInput       = document.getElementById('navSearchInput');
+        const searchResultsDrop    = document.getElementById('searchResultsDropdown');
+        let searchOpen        = false;
+        let _navSearchTimeout = null;
 
         if (searchToggleBtn) {
-            searchToggleBtn.addEventListener('click', function(e) {
+            searchToggleBtn.addEventListener('click', e => {
                 e.stopPropagation();
                 searchOpen = !searchOpen;
                 if (searchOpen) {
@@ -896,94 +1012,89 @@
                     setTimeout(() => navSearchInput.focus(), 350);
                 } else {
                     searchInputWrap.classList.remove('open');
-                    searchResultsDropdown.classList.remove('show');
+                    searchResultsDrop.classList.remove('show');
                     navSearchInput.value = '';
                 }
             });
         }
 
         if (navSearchInput) {
-            navSearchInput.addEventListener('input', function() {
-                clearTimeout(searchTimeout);
+            navSearchInput.addEventListener('input', function () {
+                clearTimeout(_navSearchTimeout);
                 const q = this.value.trim();
-                if (q.length < 2) { 
-                    searchResultsDropdown.classList.remove('show'); 
-                    return; 
-                }
-                searchResultsDropdown.innerHTML = '<div class="search-loading">Recherche...</div>';
-                searchResultsDropdown.classList.add('show');
-                searchTimeout = setTimeout(() => doSearch(q), 300);
+                if (q.length < 2) { searchResultsDrop.classList.remove('show'); return; }
+                searchResultsDrop.innerHTML = '<div class="search-loading">Recherche…</div>';
+                searchResultsDrop.classList.add('show');
+                _navSearchTimeout = setTimeout(() => doNavSearch(q), 300);
+            });
+
+            navSearchInput.addEventListener('keydown', e => {
+                if (e.key === 'Escape') searchToggleBtn.click();
             });
         }
 
-        async function doSearch(q) {
+        async function doNavSearch(q) {
             try {
-                const res = await fetch(`/products/search?q=${encodeURIComponent(q)}`);
+                const res  = await fetch(`/products/search?q=${encodeURIComponent(q)}`);
                 const data = await res.json();
                 if (!data.length) {
-                    searchResultsDropdown.innerHTML = '<div class="search-no-results">Aucun résultat trouvé</div>';
+                    searchResultsDrop.innerHTML = '<div class="search-no-results">Aucun résultat trouvé</div>';
                     return;
                 }
-                searchResultsDropdown.innerHTML = data.map(p => `
+                searchResultsDrop.innerHTML = data.map(p => `
                     <a href="/products/${p.id}" class="search-result-item">
-                        <img class="search-result-img" src="${p.image_url || ''}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/42x42/f5e6ea/c8748a?text=G'">
+                        <img class="search-result-img"
+                             src="${p.image_url || ''}" alt="${escHtml(p.name)}"
+                             onerror="this.src='https://via.placeholder.com/42x42/f5e6ea/c8748a?text=G'">
                         <div class="search-result-info">
-                            <div class="search-result-name">${escapeHtml(p.name)}</div>
-                            <div class="search-result-brand">${p.brand || p.category || ''}</div>
+                            <div class="search-result-name">${escHtml(p.name)}</div>
+                            <div class="search-result-brand">${escHtml(p.brand || p.category || '')}</div>
                         </div>
                         <div class="search-result-price">${parseFloat(p.price).toFixed(2)} TND</div>
                     </a>
                 `).join('');
-            } catch(e) {
-                searchResultsDropdown.innerHTML = '<div class="search-no-results">Erreur de connexion</div>';
+            } catch (_) {
+                searchResultsDrop.innerHTML = '<div class="search-no-results">Erreur de connexion</div>';
             }
         }
 
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/[&<>]/g, function(m) {
-                if (m === '&') return '&amp;';
-                if (m === '<') return '&lt;';
-                if (m === '>') return '&gt;';
-                return m;
-            });
+        function escHtml(str) {
+            return (str || '').replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
         }
 
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', e => {
             const wrap = document.getElementById('searchWrap');
             if (wrap && !wrap.contains(e.target)) {
-                if (searchInputWrap) searchInputWrap.classList.remove('open');
-                if (searchResultsDropdown) searchResultsDropdown.classList.remove('show');
-                if (navSearchInput) navSearchInput.value = '';
+                searchInputWrap && searchInputWrap.classList.remove('open');
+                searchResultsDrop && searchResultsDrop.classList.remove('show');
+                navSearchInput && (navSearchInput.value = '');
                 searchOpen = false;
             }
         });
 
-        if (navSearchInput) {
-            navSearchInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') { 
-                    if (searchToggleBtn) searchToggleBtn.click(); 
-                }
-            });
-        }
-
-        // CART BADGE
-        function updateCartBadge(count, animate = true) {
+        // ── BADGE PANIER (global) ────────────────────────────────────────────
+        window.updateCartBadge = function (count, animate = true) {
             const badge = document.getElementById('cart-badge');
             if (!badge) return;
-            const safeCount = Math.max(0, parseInt(count || 0));
-            if (safeCount <= 0) { badge.textContent = 0; badge.style.display = 'none'; return; }
-            badge.style.display = 'flex'; badge.textContent = safeCount;
-            if (animate) { badge.classList.remove('bump'); void badge.offsetWidth; badge.classList.add('bump'); }
-        }
+            const n = Math.max(0, parseInt(count || 0));
+            badge.style.display = n > 0 ? 'flex' : 'none';
+            badge.textContent   = n;
+            if (animate && n > 0) {
+                badge.classList.remove('bump');
+                void badge.offsetWidth;
+                badge.classList.add('bump');
+            }
+        };
 
-        // REVEAL
-        document.addEventListener('DOMContentLoaded', function() {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add('show'); });
+        // ── ANIMATIONS AU SCROLL ─────────────────────────────────────────────
+        document.addEventListener('DOMContentLoaded', () => {
+            const obs = new IntersectionObserver(entries => {
+                entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('show'); });
             }, { threshold: 0.12 });
-            document.querySelectorAll('.reveal-up').forEach((el) => observer.observe(el));
+            document.querySelectorAll('.reveal-up').forEach(el => obs.observe(el));
         });
+
+    })(); // fin IIFE
     </script>
 </body>
 </html>

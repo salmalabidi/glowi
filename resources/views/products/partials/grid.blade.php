@@ -9,7 +9,7 @@
         <div class="product-overlay">
             <a href="{{ route('products.show', $product) }}" class="overlay-btn">Voir</a>
             @auth
-            <button class="wishlist-btn" onclick="toggleWish(this)">♡</button>
+            <button class="wishlist-btn" onclick="toggleWish(this, {{ $product->id }})">♡</button>
             @endauth
         </div>
     </div>
