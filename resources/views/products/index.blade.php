@@ -383,10 +383,64 @@
     color: rgba(200,116,138,0.60);
 }
 
+/* ✅ FIX: Double slider prix */
+.price-range-dual {
+    position: relative;
+    height: 36px;
+    display: flex;
+    align-items: center;
+}
+
+.price-range-dual input[type=range] {
+    position: absolute;
+    width: 100%;
+    appearance: none;
+    -webkit-appearance: none;
+    background: transparent;
+    pointer-events: none;
+    height: 4px;
+    cursor: pointer;
+}
+
+.price-range-dual input[type=range]::-webkit-slider-thumb {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--rose);
+    border: 2px solid #fff;
+    box-shadow: 0 2px 8px rgba(200,116,138,0.4);
+    pointer-events: all;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+.price-range-dual input[type=range]::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+}
+
+.price-range-dual input[type=range]::-moz-range-thumb {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--rose);
+    border: 2px solid #fff;
+    pointer-events: all;
+    cursor: pointer;
+}
+
+.price-range-dual::before {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    height: 4px;
+    background: rgba(200,116,138,0.2);
+    border-radius: 2px;
+}
+
 .price-range input[type=range] {
     width: 100%;
     accent-color: var(--rose);
-    cursor: none;
+    cursor: pointer;
 }
 
 .price-labels {
@@ -967,17 +1021,30 @@
                     <div class="sidebar-title">Prix</div>
 
                     <div class="price-range">
-                        <input
-                            type="range"
-                            min="0"
-                            max="200"
-                            value="{{ request('max_price', 200) }}"
-                            id="price-range"
-                            oninput="document.getElementById('price-val').textContent=this.value+' TND'; clearTimeout(window._priceT); window._priceT=setTimeout(applyFilters, 500);"
-                        >
+                        {{-- ✅ FIX: double slider min + max pour filtrage réel --}}
+                        <div class="price-range-dual">
+                            <input
+                                type="range"
+                                min="0"
+                                max="200"
+                                step="5"
+                                value="{{ request('min_price', 0) }}"
+                                id="price-range-min"
+                                oninput="updatePriceRange()"
+                            >
+                            <input
+                                type="range"
+                                min="0"
+                                max="200"
+                                step="5"
+                                value="{{ request('max_price', 200) }}"
+                                id="price-range-max"
+                                oninput="updatePriceRange()"
+                            >
+                        </div>
                         <div class="price-labels">
-                            <span>0 TND</span>
-                            <span id="price-val">{{ request('max_price', 200) }} TND</span>
+                            <span id="price-val-min">{{ request('min_price', 0) }} TND</span>
+                            <span id="price-val-max">{{ request('max_price', 200) }} TND</span>
                         </div>
                     </div>
                 </div>
@@ -1094,6 +1161,56 @@ const searchInput = document.getElementById('search-input');
 const loader = document.getElementById('search-loader');
 const grid = document.getElementById('products-grid');
 
+// ✅ FIX: Fonction double slider prix
+function updatePriceRange() {
+    const minSlider = document.getElementById('price-range-min');
+    const maxSlider = document.getElementById('price-range-max');
+    if (!minSlider || !maxSlider) return;
+
+    let minVal = parseInt(minSlider.value);
+    let maxVal = parseInt(maxSlider.value);
+
+    // Empêcher le croisement des deux curseurs
+    if (minVal >= maxVal) {
+        minVal = maxVal - 5;
+        if (minVal < 0) minVal = 0;
+        minSlider.value = minVal;
+    }
+
+    document.getElementById('price-val-min').textContent = minVal + ' TND';
+    document.getElementById('price-val-max').textContent = maxVal + ' TND';
+
+    // Colorier la track entre les deux curseurs
+    const percent1 = (minVal / 200) * 100;
+    const percent2 = (maxVal / 200) * 100;
+    const track = minSlider.closest('.price-range-dual');
+    if (track) {
+        track.style.setProperty('--p1', percent1 + '%');
+        track.style.setProperty('--p2', percent2 + '%');
+    }
+
+    clearTimeout(window._priceT);
+    window._priceT = setTimeout(applyFilters, 500);
+}
+
+// Initialiser le slider au chargement
+document.addEventListener('DOMContentLoaded', function() {
+    updatePriceRange();
+    // Colorier dynamiquement la track via pseudo-élément
+    document.querySelectorAll('.price-range-dual').forEach(wrap => {
+        const style = document.createElement('style');
+        style.id = 'price-track-style';
+        document.head.appendChild(style);
+        const updateStyle = () => {
+            const p1 = wrap.style.getPropertyValue('--p1') || '0%';
+            const p2 = wrap.style.getPropertyValue('--p2') || '100%';
+            style.textContent = `.price-range-dual input[type=range] { background: linear-gradient(to right, rgba(200,116,138,0.15) ${p1}, var(--rose) ${p1}, var(--rose) ${p2}, rgba(200,116,138,0.15) ${p2}); }`;
+        };
+        wrap.addEventListener('input', updateStyle);
+        updateStyle();
+    });
+});
+
 if (searchInput) {
     searchInput.addEventListener('input', () => {
         clearTimeout(searchTimeout);
@@ -1107,17 +1224,22 @@ if (searchInput) {
 
 function applyFilters() {
     const params = new URLSearchParams();
-    const search = searchInput.value.trim();
+    const search = searchInput ? searchInput.value.trim() : '';
     const cat = document.getElementById('cat-filter').value;
     const type = document.getElementById('type-filter').value;
     const sort = document.getElementById('sort-filter').value;
-    const price = document.getElementById('price-range').value;
+    const minRange = document.getElementById('price-range-min');
+    const maxRange = document.getElementById('price-range-max');
+    const minPrice = minRange ? parseInt(minRange.value) : 0;
+    const maxPrice = maxRange ? parseInt(maxRange.value) : 200;
 
     if (search) params.set('search', search);
     if (cat) params.set('category', cat);
     if (type) params.set('type', type);
     if (sort && sort !== 'newest') params.set('sort', sort);
-    if (price && parseInt(price) < 200) params.set('max_price', price);
+    // ✅ FIX: envoyer min_price et max_price séparément
+    if (minPrice > 0) params.set('min_price', minPrice);
+    if (maxPrice < 200) params.set('max_price', maxPrice);
 
     const url = '/products/search?' + params.toString();
 
