@@ -450,96 +450,164 @@
         @keyframes cartBadgeBump { 0% { transform: scale(1); } 50% { transform: scale(1.28); } 100% { transform: scale(1); } }
 
         /* USER */
-        .user-menu { position: relative; z-index: 1500; }
+        .user-menu {
+    position: relative;
+    z-index: 1500;
+}
 
-        .user-menu-trigger {
-            background: transparent; border: none; padding: 0;
-            display: flex; align-items: center; justify-content: center;
-        }
+.user-menu-trigger {
+    background: transparent;
+    border: none;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-        .user-avatar {
-            position: relative; width: 46px; height: 46px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #cf8ca0, #dcb177);
-            display: flex; align-items: center; justify-content: center;
-            color: #fff; font-size: 0.82rem; font-weight: 700;
-            letter-spacing: 0.03em;
-            border: 1px solid rgba(255,255,255,0.16);
-            box-shadow: 0 10px 26px rgba(200,116,138,0.18);
-            overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
+.user-avatar {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #cf8ca0, #dcb177);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 0.86rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    border: 1px solid rgba(255,255,255,0.16);
+    box-shadow: 0 12px 28px rgba(200,116,138,0.18);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
 
-        .user-avatar img {
-            width: 100%; height: 100%;
-            object-fit: cover;
-            position: absolute; inset: 0;
-            border-radius: 50%;
-            z-index: 3;
-        }
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    z-index: 3;
+}
 
-        .user-avatar::before {
-            content: '';
-            position: absolute; inset: -35%;
-            background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.42), transparent 55%);
-            animation: spinRing 4s linear infinite; opacity: 0.85;
-        }
+.user-avatar::before {
+    content: '';
+    position: absolute;
+    inset: -35%;
+    background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.42), transparent 55%);
+    animation: spinRing 4s linear infinite;
+    opacity: 0.85;
+}
 
-        .user-avatar::after {
-            content: ''; position: absolute; inset: 3px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
-            backdrop-filter: blur(8px);
-        }
+.user-avatar::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+    backdrop-filter: blur(8px);
+}
 
-        .user-avatar span { position: relative; z-index: 2; }
+.user-avatar span {
+    position: relative;
+    z-index: 2;
+}
 
-        .user-menu:hover .user-avatar,
-        .user-menu.open .user-avatar {
-            transform: translateY(-2px) scale(1.04);
-            box-shadow: 0 16px 34px rgba(200,116,138,0.24);
-        }
+.user-menu:hover .user-avatar,
+.user-menu.open .user-avatar {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 18px 36px rgba(200,116,138,0.24);
+}
 
-        .user-dropdown {
-            position: absolute; top: calc(100% + 12px); right: 0;
-            min-width: 220px;
-            background: rgba(26,15,20,0.98);
-            border: 1px solid rgba(201,169,110,0.18);
-            border-radius: 14px; padding: 10px 0;
-            opacity: 0; pointer-events: none;
-            transform: translateY(8px);
-            transition: opacity 0.25s ease, transform 0.25s ease;
-            z-index: 2000;
-            box-shadow: 0 18px 50px rgba(0,0,0,0.28);
-            backdrop-filter: blur(20px);
-        }
+.user-dropdown {
+    position: absolute;
+    top: calc(100% + 14px);
+    right: 0;
+    min-width: 280px;
+    background: rgba(26,15,20,0.98);
+    border: 1px solid rgba(201,169,110,0.18);
+    border-radius: 18px;
+    padding: 0;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(10px) scale(0.98);
+    transition: opacity 0.28s ease, transform 0.28s ease;
+    z-index: 2000;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.30);
+    backdrop-filter: blur(20px);
+    overflow: hidden;
+}
 
-        .user-menu.open .user-dropdown { opacity: 1; pointer-events: auto; transform: translateY(0); }
+.user-menu.open .user-dropdown {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+}
 
-        .user-dropdown a, .user-dropdown button {
-            display: block; width: 100%; padding: 12px 20px;
-            text-align: left; color: rgba(255,255,255,0.78);
-            text-decoration: none; background: none; border: none;
-            font-family: 'Jost', sans-serif; font-size: 0.76rem;
-            letter-spacing: 0.08em;
-            transition: color 0.2s ease, background 0.2s ease;
-        }
+.user-dropdown-header {
+    padding: 18px 20px 16px;
+    background: linear-gradient(135deg, rgba(200,116,138,0.14), rgba(201,169,110,0.10));
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
 
-        .user-dropdown a:hover, .user-dropdown button:hover { color: var(--gold); background: rgba(255,255,255,0.03); }
-        .user-dropdown form { margin: 0; }
+.user-dropdown-name {
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
 
-        .btn-connexion {
-            background: var(--rose); color: #fff; border: none;
-            font-family: 'Jost', sans-serif; font-size: 0.68rem;
-            font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase;
-            padding: 11px 22px; border-radius: 999px;
-            text-decoration: none;
-            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
-            display: inline-block;
-        }
+.user-dropdown-email {
+    color: rgba(255,255,255,0.45);
+    font-size: 0.76rem;
+}
 
-        .btn-connexion:hover { background: var(--rose-deep); transform: translateY(-1px); box-shadow: 0 12px 24px rgba(200,116,138,0.18); }
+.user-dropdown-links {
+    padding: 10px;
+}
 
+.user-dropdown-links a,
+.user-dropdown-links button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 14px;
+    border-radius: 14px;
+    text-decoration: none;
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.78);
+    font-family: 'Jost', sans-serif;
+    font-size: 0.82rem;
+    text-align: left;
+    transition: background 0.22s ease, color 0.22s ease, transform 0.22s ease;
+}
+
+.user-dropdown-links a:hover,
+.user-dropdown-links button:hover {
+    background: rgba(255,255,255,0.05);
+    color: var(--gold);
+    transform: translateX(4px);
+}
+
+.user-dropdown-links .admin-link {
+    background: linear-gradient(135deg, rgba(200,116,138,0.10), rgba(201,169,110,0.08));
+    border: 1px solid rgba(200,116,138,0.10);
+    color: #fff;
+}
+
+.user-dropdown-links .admin-link:hover {
+    background: linear-gradient(135deg, rgba(200,116,138,0.18), rgba(201,169,110,0.14));
+    color: var(--gold);
+}
+
+.logout-btn {
+    cursor: none;
+}
         /* MARQUEE */
         .marquee-bar {
             position: fixed;
@@ -776,6 +844,44 @@
                 </a>
 
                 <div class="user-menu" id="userMenu">
+    <button type="button" class="user-menu-trigger" id="userMenuTrigger" aria-expanded="false" aria-haspopup="true">
+        
+    </button>
+
+    <div class="user-dropdown" id="userDropdown">
+        <div class="user-dropdown-header">
+            <div class="user-dropdown-name">{{ Auth::user()->name }}</div>
+            <div class="user-dropdown-email">{{ Auth::user()->email }}</div>
+        </div>
+
+        <div class="user-dropdown-links">
+            <a href="{{ route('profile.index') }}">
+                
+                <span>Mon profil</span>
+            </a>
+
+            <a href="{{ route('orders') }}">
+                
+                <span>Mes commandes</span>
+            </a>
+
+            @if(Auth::user()->is_admin)
+                <a href="{{ route('admin.dashboard') }}" class="admin-link">
+                
+                    <span>Dashboard admin</span>
+                </a>
+            @endif
+
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="logout-btn">
+                    <span>↘</span>
+                    <span>Déconnexion</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
                     <button type="button" class="user-menu-trigger" id="userMenuTrigger" aria-expanded="false" aria-haspopup="true">
                         <div class="user-avatar">
                             @if(Auth::user()->avatar)
@@ -981,21 +1087,23 @@
         }
 
         // ── USER MENU ────────────────────────────────────────────────────────
-        const userMenu        = document.getElementById('userMenu');
-        const userMenuTrigger = document.getElementById('userMenuTrigger');
-        if (userMenu && userMenuTrigger) {
-            userMenuTrigger.addEventListener('click', e => {
-                e.stopPropagation();
-                const open = userMenu.classList.toggle('open');
-                userMenuTrigger.setAttribute('aria-expanded', open ? 'true' : 'false');
-            });
-            document.addEventListener('click', e => {
-                if (!userMenu.contains(e.target)) {
-                    userMenu.classList.remove('open');
-                    userMenuTrigger.setAttribute('aria-expanded', 'false');
-                }
-            });
+      const userMenu = document.getElementById('userMenu');
+const userMenuTrigger = document.getElementById('userMenuTrigger');
+
+if (userMenu && userMenuTrigger) {
+    userMenuTrigger.addEventListener('click', function (e) {
+        e.stopPropagation();
+        const open = userMenu.classList.toggle('open');
+        userMenuTrigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+
+    document.addEventListener('click', function (e) {
+        if (!userMenu.contains(e.target)) {
+            userMenu.classList.remove('open');
+            userMenuTrigger.setAttribute('aria-expanded', 'false');
         }
+    });
+}
 
         // ── RECHERCHE NAVBAR ─────────────────────────────────────────────────
         const searchToggleBtn      = document.getElementById('searchToggleBtn');

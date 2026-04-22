@@ -3,13 +3,23 @@
 @section('content')
 <style>
 .admin-page {
-    max-width: 1320px;
+    max-width: 1360px;
     margin: 0 auto;
-    padding: 56px 34px 100px;
+    padding: 56px 32px 100px;
 }
 
 .admin-hero {
-    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 30px;
+    padding: 34px 34px;
+    margin-bottom: 28px;
+    background:
+        radial-gradient(circle at 12% 18%, rgba(200,116,138,0.16), transparent 25%),
+        radial-gradient(circle at 90% 30%, rgba(201,169,110,0.14), transparent 28%),
+        linear-gradient(135deg, rgba(255,255,255,0.92), rgba(255,255,255,0.82));
+    border: 1px solid rgba(200,116,138,0.10);
+    box-shadow: 0 24px 50px rgba(36,18,25,0.07);
     animation: fadeSlideUp 0.7s ease both;
 }
 
@@ -23,7 +33,7 @@
 
 .admin-title {
     font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(2.8rem, 5vw, 4.4rem);
+    font-size: clamp(2.8rem, 5vw, 4.3rem);
     color: var(--text);
     line-height: 1;
     margin-bottom: 12px;
@@ -52,7 +62,7 @@
     font-size: 0.78rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    transition: transform .25s ease, box-shadow .25s ease;
+    transition: transform .25s ease, box-shadow .25s ease, background .25s ease;
 }
 
 .admin-btn.primary {
@@ -75,16 +85,35 @@
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 18px;
-    margin: 34px 0;
+    margin: 30px 0;
 }
 
 .admin-card {
-    background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.86));
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,255,255,0.86));
     border: 1px solid rgba(200,116,138,0.10);
     border-radius: 24px;
     padding: 22px;
     box-shadow: 0 18px 42px rgba(36,18,25,0.06);
     animation: fadeSlideUp 0.8s ease both;
+    transition: transform .28s ease, box-shadow .28s ease;
+}
+
+.admin-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 24px 54px rgba(36,18,25,0.10);
+}
+
+.admin-card::after {
+    content: '';
+    position: absolute;
+    top: -30px;
+    right: -30px;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(200,116,138,0.12), transparent 70%);
 }
 
 .admin-card:nth-child(2) { animation-delay: .05s; }
@@ -123,7 +152,7 @@
 }
 
 .admin-panel {
-    background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.86));
+    background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,255,255,0.86));
     border: 1px solid rgba(200,116,138,0.10);
     border-radius: 28px;
     padding: 26px;
@@ -135,7 +164,7 @@
     font-family: 'Cormorant Garamond', serif;
     font-size: 2rem;
     color: var(--text);
-    margin-bottom: 14px;
+    margin-bottom: 16px;
 }
 
 .admin-table {
@@ -153,6 +182,12 @@
     border-radius: 18px;
     background: rgba(200,116,138,0.05);
     border: 1px solid rgba(200,116,138,0.08);
+    transition: transform .22s ease, background .22s ease;
+}
+
+.admin-row:hover {
+    transform: translateX(4px);
+    background: rgba(200,116,138,0.08);
 }
 
 .admin-row strong {
@@ -188,6 +223,31 @@
     color: #a63d3d;
 }
 
+.dashboard-mini-links {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 18px;
+}
+
+.dashboard-mini-link {
+    padding: 10px 14px;
+    border-radius: 999px;
+    background: rgba(200,116,138,0.08);
+    color: var(--rose-deep);
+    text-decoration: none;
+    font-size: 0.74rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    border: 1px solid rgba(200,116,138,0.10);
+    transition: transform .22s ease, background .22s ease;
+}
+
+.dashboard-mini-link:hover {
+    transform: translateY(-2px);
+    background: rgba(200,116,138,0.14);
+}
+
 @keyframes fadeSlideUp {
     from {
         opacity: 0;
@@ -213,7 +273,7 @@
 
 @media (max-width: 700px) {
     .admin-page {
-        padding: 40px 20px 80px;
+        padding: 40px 18px 80px;
     }
 
     .admin-grid {
@@ -231,14 +291,22 @@
         <div class="admin-kicker">Dashboard administrateur</div>
         <h1 class="admin-title">Pilotage du site</h1>
         <p class="admin-subtitle">
-            Vue analytique du site : utilisateurs, produits, commandes et revenus.
-            Cette session admin vous permettra ensuite de gérer les utilisateurs, les produits et la validation des commandes.
+            Vue analytique complète du site. Gérez les utilisateurs, les produits et les commandes depuis un seul espace élégant et dynamique.
         </p>
 
         <div class="admin-actions">
             <a href="#" class="admin-btn primary">Utilisateurs</a>
             <a href="#" class="admin-btn secondary">Produits</a>
             <a href="#" class="admin-btn secondary">Commandes</a>
+        </div>
+
+        <div class="dashboard-mini-links">
+            <a href="{{ route('profile.index') }}" class="dashboard-mini-link">Mon profil</a>
+            <a href="{{ route('orders') }}" class="dashboard-mini-link">Mes commandes</a>
+            <form method="POST" action="{{ route('logout') }}" style="display:inline;">
+                @csrf
+                <button type="submit" class="dashboard-mini-link" style="background:none; cursor:none;">Déconnexion</button>
+            </form>
         </div>
     </div>
 
