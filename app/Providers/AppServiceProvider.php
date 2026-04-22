@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Pagination\Paginator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -14,14 +15,13 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Utiliser notre vue de pagination personnalisée (div au lieu de nav)
+        Paginator::defaultView('pagination.custom');
+        Paginator::defaultSimpleView('pagination.custom');
+
         View::composer('*', function ($view) {
             $cartCount = collect(session('cart', []))->sum('quantity');
-            $wishCount = 0;
-            if (auth()->check()) {
-                $wishCount = \App\Models\Wishlist::where('user_id', auth()->id())->count();
-            }
             $view->with('cartCount', $cartCount);
-            $view->with('wishCount', $wishCount);
         });
     }
 }

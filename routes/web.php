@@ -9,13 +9,14 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ReviewController;
 
 // HOME
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // PRODUCTS
-Route::get('/products',        [ProductController::class, 'index'])->name('products.index');
-Route::get('/products/search', [ProductController::class, 'search'])->name('products.search');
+Route::get('/products',           [ProductController::class, 'index'])->name('products.index');
+Route::get('/products/search',    [ProductController::class, 'search'])->name('products.search');
 Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
 
 // AUTH
@@ -56,4 +57,8 @@ Route::middleware('auth')->group(function () {
 
     // Alias profil (compatibilité anciennes vues)
     Route::get('/profile/show', fn() => redirect()->route('profile.index'))->name('profile');
+
+    // ÉVALUATIONS (Reviews)
+    Route::post('/products/{product}/reviews',  [ReviewController::class, 'store'])->name('reviews.store');
+    Route::delete('/reviews/{review}',          [ReviewController::class, 'destroy'])->name('reviews.destroy');
 });

@@ -146,6 +146,7 @@ class ProductController extends Controller
     public function show(Product $product)
     {
         $product->load('category');
+
         $related = Product::where('active', true)
             ->where('stock', '>', 0)
             ->where('id', '!=', $product->id)
@@ -157,6 +158,12 @@ class ProductController extends Controller
             ->take(4)
             ->get();
 
-        return view('products.show', compact('product', 'related'));
+        // Charger les avis avec l'utilisateur, du plus récent au plus ancien
+        $reviews = $product->reviews()
+            ->with('user')
+            ->latest()
+            ->get();
+
+        return view('products.show', compact('product', 'related', 'reviews'));
     }
 }

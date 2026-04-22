@@ -205,9 +205,9 @@
 
 /* SEARCH / FILTER BAR */
 .search-bar-wrap {
-    position: sticky;
-    top: 70px;
-    z-index: 100;
+    position: relative;
+    top: 0;
+    z-index: 1;
     background: rgba(253, 246, 240, 0.92);
     backdrop-filter: blur(16px);
     border-bottom: 1px solid var(--line);
@@ -322,8 +322,8 @@
 
 /* SIDEBAR */
 .sidebar {
-    position: sticky;
-    top: 152px;
+    position: relative;
+    top: 0;
 }
 
 .sidebar-shell {
