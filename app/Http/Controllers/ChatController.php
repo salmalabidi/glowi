@@ -20,10 +20,14 @@ class ChatController extends Controller
             'body' => 'required|string|max:500',
         ]);
 
-        Message::create([
+        $message = Message::create([
             'user_id' => Auth::id(),
             'body'    => $request->body,
         ]);
+
+        if ($request->expectsJson() || $request->wantsJson() || $request->isXmlHttpRequest()) {
+            return response()->json(['success' => true, 'id' => $message->id]);
+        }
 
         return back();
     }

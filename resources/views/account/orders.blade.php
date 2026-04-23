@@ -454,7 +454,19 @@
                     <div class="order-footer">
                         <div class="order-badges">
                             <span class="order-mini-badge">{{ $order->items->count() }} article(s)</span>
-                            <span class="order-mini-badge">Commande #{{ $order->id }}</span>
+                            <a href="{{ route('orders.show', $order) }}" class="order-mini-badge" style="text-decoration:none;background:rgba(200,116,138,.13);color:var(--rose-deep);">📦 Voir détails</a>
+                        </div>
+
+                        @php $step = $order->delivery_step ?? 0; @endphp
+                        <div style="flex:1;padding:0 20px;">
+                            <div style="font-size:.62rem;color:var(--text-light);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;">Livraison</div>
+                            <div style="display:flex;align-items:center;gap:4px;">
+                                @php $stepsLabel = ['Confirmée','Préparation','Prête','Collectée','En route','Livrée']; @endphp
+                                @foreach($stepsLabel as $si => $sl)
+                                    <div style="flex:1;height:4px;border-radius:999px;background:{{ $si <= $step ? 'linear-gradient(90deg,var(--rose),var(--gold))' : 'rgba(200,116,138,.12)' }};"></div>
+                                @endforeach
+                            </div>
+                            <div style="font-size:.68rem;color:var(--rose-deep);margin-top:4px;">{{ $stepsLabel[$step] ?? 'Confirmée' }}</div>
                         </div>
 
                         <div>

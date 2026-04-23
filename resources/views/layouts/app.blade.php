@@ -913,6 +913,11 @@
                                 <span class="dropdown-link-arrow">↗</span>
                             </a>
 
+                            <a href="{{ route('user.products.index') }}">
+                                <span class="dropdown-link-text">Espace vendeur</span>
+                                <span class="dropdown-link-arrow">↗</span>
+                            </a>
+
                             @if(Auth::user()->is_admin)
                                 <a href="{{ route('admin.dashboard') }}" class="admin-link">
                                     <span class="dropdown-link-text">Dashboard admin</span>

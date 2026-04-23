@@ -124,6 +124,29 @@ class CartController extends Controller
         ]);
     }
 
+    /**
+     * Acheter maintenant — ajoute au panier et redirige vers le checkout.
+     */
+    public function buyNow(Request $request)
+    {
+        $data = $request->validate([
+            'product_id' => ['required', 'exists:products,id'],
+            'quantity'   => ['nullable', 'integer', 'min:1'],
+        ]);
+
+        $quantity = max(1, (int) ($data['quantity'] ?? 1));
+
+        $cart = [];
+        $cart[] = [
+            'product_id' => (int) $data['product_id'],
+            'quantity'   => $quantity,
+        ];
+
+        session()->put('cart', $cart);
+
+        return redirect()->route('checkout.index');
+    }
+
     public function remove(Request $request, $item)
     {
         $cart = collect(session()->get('cart', []))
