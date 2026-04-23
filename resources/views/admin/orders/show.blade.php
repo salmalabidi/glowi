@@ -120,6 +120,22 @@
             </select>
             <button type="submit" class="btn-save">Enregistrer</button>
         </form>
+
+        {{-- Étape de livraison --}}
+        <div class="section-title" style="font-size:1.2rem;margin-bottom:12px;margin-top:22px;">Étape de livraison</div>
+        <form method="POST" action="{{ route('admin.orders.update', $order) }}" class="status-form">
+            @csrf @method('PUT')
+            <input type="hidden" name="status" value="{{ $order->status }}">
+            <select name="delivery_step" class="form-select">
+                <option value="0" {{ ($order->delivery_step??0)==0 ? 'selected' : '' }}>0 — Commande confirmée</option>
+                <option value="1" {{ ($order->delivery_step??0)==1 ? 'selected' : '' }}>1 — En préparation</option>
+                <option value="2" {{ ($order->delivery_step??0)==2 ? 'selected' : '' }}>2 — Prête pour collecte</option>
+                <option value="3" {{ ($order->delivery_step??0)==3 ? 'selected' : '' }}>3 — Collectée par le livreur</option>
+                <option value="4" {{ ($order->delivery_step??0)==4 ? 'selected' : '' }}>4 — En cours de livraison</option>
+                <option value="5" {{ ($order->delivery_step??0)==5 ? 'selected' : '' }}>5 — Livrée ✓</option>
+            </select>
+            <button type="submit" class="btn-save">Mettre à jour</button>
+        </form>
     </div>
 
     {{-- Articles --}}

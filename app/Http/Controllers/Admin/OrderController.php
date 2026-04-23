@@ -37,12 +37,18 @@ class OrderController extends Controller
     public function update(Request $request, Order $order)
     {
         $request->validate([
-            'status' => 'required|in:pending,validated,cancelled',
+            'status'        => 'required|in:pending,validated,cancelled',
+            'delivery_step' => 'nullable|integer|min:0|max:5',
         ]);
 
-        $order->update(['status' => $request->status]);
+        $data = ['status' => $request->status];
+        if ($request->has('delivery_step')) {
+            $data['delivery_step'] = (int) $request->delivery_step;
+        }
 
-        return back()->with('success', 'Statut de la commande mis à jour.');
+        $order->update($data);
+
+        return back()->with('success', 'Commande mise à jour avec succès.');
     }
 
     public function destroy(Order $order)

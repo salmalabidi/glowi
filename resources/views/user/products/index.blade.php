@@ -258,6 +258,11 @@
                         <span class="annonce-status {{ $product->active ? 'badge-on' : 'badge-off' }}">
                             {{ $product->active ? 'Actif' : 'Inactif' }}
                         </span>
+                        {{-- Lien "Voir la fiche" --}}
+                        <a href="{{ route('products.show', $product) }}" target="_blank"
+                           style="position:absolute;bottom:10px;left:10px;padding:4px 12px;border-radius:999px;background:rgba(255,255,255,.88);color:var(--rose-deep);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;border:1px solid rgba(200,116,138,.22);backdrop-filter:blur(6px);">
+                            👁 Voir
+                        </a>
                     </div>
                     <div class="annonce-body">
                         <div class="annonce-name" title="{{ $product->name }}">{{ $product->name }}</div>

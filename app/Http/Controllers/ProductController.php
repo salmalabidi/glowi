@@ -238,6 +238,9 @@ class ProductController extends Controller
             ->latest()
             ->get();
 
-        return view('products.show', compact('product', 'related', 'reviews'));
+        $wishlistIds = session()->get('wishlist', []);
+        $inWishlist  = in_array($product->id, $wishlistIds);
+
+        return view('products.show', compact('product', 'related', 'reviews', 'inWishlist'));
     }
 }
