@@ -17,22 +17,18 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 
-// ── HOME ─────────────────────────────────────────────────────────────────────
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-// ── CATALOGUE (public) ───────────────────────────────────────────────────────
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/products/search', [ProductController::class, 'search'])->name('products.search');
 Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
 
-// ── AUTH ─────────────────────────────────────────────────────────────────────
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login')->middleware('guest');
 Route::post('/login', [AuthController::class, 'login'])->middleware('guest');
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register')->middleware('guest');
 Route::post('/register', [AuthController::class, 'register'])->middleware('guest');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
-// ── ADMIN ────────────────────────────────────────────────────────────────────
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -57,15 +53,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::delete('/orders/{order}', [AdminOrderController::class, 'destroy'])->name('orders.destroy');
 });
 
-// ── ROUTES PROTÉGÉES (auth) ──────────────────────────────────────────────────
 Route::middleware('auth')->group(function () {
-
-    // ── Chat privé ────────────────────────────────────────────────────────
     Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
     Route::get('/chat/poll', [ChatController::class, 'poll'])->name('chat.poll');
     Route::post('/chat', [ChatController::class, 'store'])->name('chat.store');
+    Route::get('/chat/unread-count', [ChatController::class, 'unreadCount'])->name('chat.unread-count');
 
-    // ── Mes produits (vendeur) ───────────────────────────────────────────
     Route::get('/my-products', [UserProductController::class, 'index'])->name('user.products.index');
     Route::get('/my-products/create', [UserProductController::class, 'create'])->name('user.products.create');
     Route::post('/my-products', [UserProductController::class, 'store'])->name('user.products.store');
@@ -73,37 +66,32 @@ Route::middleware('auth')->group(function () {
     Route::put('/my-products/{product}', [UserProductController::class, 'update'])->name('user.products.update');
     Route::delete('/my-products/{product}', [UserProductController::class, 'destroy'])->name('user.products.destroy');
 
-    // ── Panier ───────────────────────────────────────────────────────────
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
     Route::post('/cart/buy-now', [CartController::class, 'buyNow'])->name('cart.buyNow');
     Route::patch('/cart/{item}/quantity', [CartController::class, 'updateQuantity'])->name('cart.quantity');
     Route::delete('/cart/{item}', [CartController::class, 'remove'])->name('cart.remove');
 
-    // ── Wishlist ────────────────────────────────────────────────────────
     Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
     Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
     Route::delete('/wishlist/{wishlist}', [WishlistController::class, 'remove'])->name('wishlist.remove');
     Route::get('/wishlist/ids', [WishlistController::class, 'ids'])->name('wishlist.ids');
 
-    // ── Checkout ────────────────────────────────────────────────────────
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
 
-    // ── Profil ──────────────────────────────────────────────────────────
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
     Route::match(['put', 'patch'], '/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::patch('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
     Route::patch('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar');
     Route::delete('/profile/avatar', [ProfileController::class, 'deleteAvatar'])->name('profile.avatar.delete');
+    Route::get('/profile/show', fn () => redirect()->route('profile.index'))->name('profile');
 
-    // ── Commandes client ────────────────────────────────────────────────
     Route::get('/orders', [OrderController::class, 'index'])->name('orders');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
 
-    Route::get('/profile/show', fn() => redirect()->route('profile.index'))->name('profile');
-
-    // ── Reviews ─────────────────────────────────────────────────────────
     Route::post('/products/{product}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
     Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
+
+    Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
 });

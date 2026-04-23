@@ -10,6 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@200;300;400;500;600&display=swap" rel="stylesheet">
 
     <style>
+        .nav-center { z-index: 2000 !important; }
+.nav-search-input-wrap { z-index: 100 !important; }
         :root {
             --rose: #c8748a;
             --rose-deep: #a85070;
@@ -294,12 +296,11 @@
             z-index: 9999;
         }
 
-        .nav-search-input-wrap.open {
-            width: 280px;
-            opacity: 1;
-            pointer-events: all;
-        }
-
+    .nav-search-input-wrap.open {
+    width: 200px; /* réduit pour ne pas toucher "Accessoires" */
+    opacity: 1;
+    pointer-events: all;
+}
         .nav-search-input {
             width: 100%;
             background: rgba(26,15,20,0.95);
@@ -917,6 +918,29 @@
                                 <span class="dropdown-link-text">Espace vendeur</span>
                                 <span class="dropdown-link-arrow">↗</span>
                             </a>
+                            <a href="{{ route('chat.index') }}">
+        <span class="dropdown-link-text"> Discussion</span>
+        <span class="dropdown-link-arrow">↗</span>
+
+        @php
+            $unread = \App\Models\Message::where('recipient_id', Auth::id())
+            ->where('is_read', false)
+            ->count();
+        @endphp
+
+        @if($unread > 0)
+            <span style="
+                background:#ff4d6d;
+                color:#fff;
+                border-radius:50%;
+                padding:4px 8px;
+                font-size:11px;
+                margin-left:8px;
+            ">
+                {{ $unread }}
+            </span>
+        @endif
+    </a>
 
                             @if(Auth::user()->is_admin)
                                 <a href="{{ route('admin.dashboard') }}" class="admin-link">
