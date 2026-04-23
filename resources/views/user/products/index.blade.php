@@ -140,12 +140,17 @@
 .annonce-stock { color:var(--text-light); font-size:.80rem; margin-bottom:14px; }
 
 .annonce-actions { display:flex; gap:7px; }
-.act { flex:1; padding:8px 0; border-radius:999px; font-size:.66rem; letter-spacing:.10em; text-transform:uppercase;
-       text-decoration:none; border:none; cursor:pointer; display:inline-flex; align-items:center; justify-content:center;
-       transition:transform .2s; }
-.act:hover { transform:translateY(-1px); }
-.act-edit   { background:rgba(201,169,110,0.14); color:#7a5a1a; border:1px solid rgba(201,169,110,0.22); }
-.act-delete { background:rgba(212,98,98,0.10); color:#a03030; border:1px solid rgba(212,98,98,0.18); }
+.act { flex:1; padding:9px 0; border-radius:999px; font-size:.66rem; letter-spacing:.10em; text-transform:uppercase;
+       text-decoration:none; border:none; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:4px;
+       transition:transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .22s, background .2s; position:relative; overflow:hidden; }
+.act::after { content:''; position:absolute; inset:0; background:rgba(255,255,255,0); transition:background .2s; border-radius:inherit; }
+.act:hover { transform:translateY(-3px) scale(1.04); }
+.act:hover::after { background:rgba(255,255,255,0.15); }
+.act:active { transform:translateY(0) scale(0.97); }
+.act-edit   { background:rgba(201,169,110,0.16); color:#7a5a1a; border:1px solid rgba(201,169,110,0.28); }
+.act-edit:hover { box-shadow:0 6px 18px rgba(201,169,110,0.22); background:rgba(201,169,110,0.26); }
+.act-delete { background:rgba(212,98,98,0.10); color:#a03030; border:1px solid rgba(212,98,98,0.20); }
+.act-delete:hover { box-shadow:0 6px 18px rgba(212,98,98,0.18); background:rgba(212,98,98,0.18); }
 
 /* Empty */
 .empty-state {
@@ -260,7 +265,9 @@
                         </span>
                         {{-- Lien "Voir la fiche" --}}
                         <a href="{{ route('products.show', $product) }}" target="_blank"
-                           style="position:absolute;bottom:10px;left:10px;padding:4px 12px;border-radius:999px;background:rgba(255,255,255,.88);color:var(--rose-deep);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;border:1px solid rgba(200,116,138,.22);backdrop-filter:blur(6px);">
+                           style="position:absolute;bottom:10px;left:10px;padding:5px 14px;border-radius:999px;background:rgba(255,255,255,.92);color:var(--rose-deep);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;border:1px solid rgba(200,116,138,.28);backdrop-filter:blur(6px);transition:transform .22s cubic-bezier(.34,1.56,.64,1),box-shadow .2s,background .2s;display:inline-flex;align-items:center;gap:4px;"
+                           onmouseover="this.style.transform='translateY(-3px) scale(1.06)';this.style.boxShadow='0 8px 20px rgba(200,116,138,0.25)';this.style.background='rgba(255,255,255,1)'"
+                           onmouseout="this.style.transform='';this.style.boxShadow='';this.style.background='rgba(255,255,255,.92)'">
                             👁 Voir
                         </a>
                     </div>
