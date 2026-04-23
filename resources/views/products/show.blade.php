@@ -150,6 +150,7 @@
     color: var(--rose); transition: background 0.2s, color 0.2s;
 }
 .btn-wishlist:hover { background: var(--rose); color: #fff; }
+.btn-wishlist.wishlisted { background: var(--rose); color:#fff; border-color: var(--rose); }
 
 /* ── Acheter maintenant ── */
 .btn-buy-now {
@@ -583,10 +584,10 @@
                         <button class="btn-add-cart" id="add-btn" onclick="addToCart({{ $product->id }})">
                             Ajouter au panier
                         </button>
-                        <button class="btn-wishlist" id="wish-btn" onclick="toggleWish(this)">♡</button>
+                        <button class="btn-wishlist {{ $inWishlist ? 'wishlisted' : '' }}" id="wish-btn" onclick="toggleWish(this)">{{ $inWishlist ? '♥' : '♡' }}</button>
                     </div>
                     {{-- Bouton Acheter maintenant --}}
-                    <form method="POST" action="{{ route('cart.add') }}" id="buyNowForm" style="margin-top:10px">
+                    <form method="POST" action="{{ route('cart.buyNow') }}" id="buyNowForm" style="margin-top:10px">
                         @csrf
                         <input type="hidden" name="product_id" value="{{ $product->id }}">
                         <input type="hidden" name="quantity" value="1" id="buyNowQty">
@@ -606,7 +607,7 @@
                             <div class="seller-info-label">Vendu par</div>
                             <div class="seller-info-name">{{ $product->user->name }}</div>
                         </div>
-                        <a href="{{ route('chat.index') }}" class="seller-chat-btn">💬 Contacter</a>
+                        <a href="{{ route('chat.index', ['user' => $product->user->id]) }}" class="seller-chat-btn">💬 Discuter</a>
                     </div>
                 @endif
             @else
@@ -842,10 +843,30 @@ async function addToCart(productId) {
     }
 }
 
-function toggleWish(btn) {
-    btn.textContent = btn.textContent === '♡' ? '♥' : '♡';
-    btn.style.background = btn.textContent === '♥' ? 'var(--rose)' : '';
-    btn.style.color = btn.textContent === '♥' ? '#fff' : '';
+async function toggleWish(btn) {
+    try {
+        const response = await fetch('/wishlist/toggle', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name=\"csrf-token\"]').content,
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ product_id: {{ $product->id }} })
+        });
+
+        if (!response.ok) throw new Error('wishlist');
+        const data = await response.json();
+        btn.textContent = data.added ? '♥' : '♡';
+        btn.classList.toggle('wishlisted', data.added);
+        btn.style.background = data.added ? 'var(--rose)' : '';
+        btn.style.color = data.added ? '#fff' : '';
+        const badge = document.querySelector('.wishlist-badge');
+        if (badge) badge.textContent = data.count;
+    } catch (e) {
+        alert('Impossible de mettre à jour la wishlist.');
+    }
 }
 
 // Sélecteur d'étoiles interactif

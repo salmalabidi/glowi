@@ -18,13 +18,14 @@ class CartController extends Controller
                 }
 
                 $quantity = max(1, (int) $item['quantity']);
-                $subtotal = (float) $product->price * $quantity;
+                $price = (float) $product->price;
+                $subtotal = $price * $quantity;
 
                 return [
                     'id' => $product->id,
                     'name' => $product->name,
                     'brand' => $product->brand,
-                    'price' => (float) $product->price,
+                    'price' => $price,
                     'image' => $product->image,
                     'quantity' => $quantity,
                     'subtotal' => $subtotal,
@@ -82,6 +83,7 @@ class CartController extends Controller
         $cart = collect(session()->get('cart', []))
             ->map(function ($cartItem) use ($item, $data) {
                 if ((int) $cartItem['product_id'] === (int) $item) {
+
                     if ($data['action'] === 'increase') {
                         $cartItem['quantity'] += 1;
                     }
@@ -101,48 +103,43 @@ class CartController extends Controller
 
         $product = Product::find($item);
         $currentItem = collect($cart)->firstWhere('product_id', (int) $item);
+
         $itemQuantity = $currentItem['quantity'] ?? 0;
-        $itemSubtotal = $product ? ((float) $product->price * $itemQuantity) : 0.0;
-        $cartCount = collect($cart)->sum('quantity');
+        $itemSubtotal = $product ? ((float) $product->price * $itemQuantity) : 0;
 
         $cartTotal = collect($cart)->sum(function ($cartItem) {
             $product = Product::find($cartItem['product_id']);
-            if (! $product) {
-                return 0;
-            }
-
-            return (float) $product->price * (int) $cartItem['quantity'];
+            return $product ? ((float) $product->price * (int) $cartItem['quantity']) : 0;
         });
 
         return response()->json([
             'success' => true,
-            'count' => $cartCount,
+            'count' => collect($cart)->sum('quantity'),
             'itemQuantity' => $itemQuantity,
-            'itemSubtotal' => number_format($itemSubtotal, 2, '.', ''),
-            'cartTotal' => number_format($cartTotal, 2, '.', ''),
+            'itemSubtotal' => number_format($itemSubtotal, 2),
+            'cartTotal' => number_format($cartTotal, 2),
             'removed' => $itemQuantity <= 0,
         ]);
     }
 
     /**
-     * Acheter maintenant — ajoute au panier et redirige vers le checkout.
+     * ✅ ACHETER MAINTENANT (corrigé propre)
      */
     public function buyNow(Request $request)
     {
-        $data = $request->validate([
+        $request->validate([
             'product_id' => ['required', 'exists:products,id'],
-            'quantity'   => ['nullable', 'integer', 'min:1'],
+            'quantity' => ['nullable', 'integer', 'min:1'],
         ]);
 
-        $quantity = max(1, (int) ($data['quantity'] ?? 1));
+        $product = Product::findOrFail($request->product_id);
+        $quantity = max(1, (int) $request->input('quantity', 1));
 
-        $cart = [];
-        $cart[] = [
-            'product_id' => (int) $data['product_id'],
-            'quantity'   => $quantity,
-        ];
-
-        session()->put('cart', $cart);
+        // 🔥 important : remplace complètement le panier
+        session()->put('cart', [[
+            'product_id' => $product->id,
+            'quantity' => $quantity,
+        ]]);
 
         return redirect()->route('checkout.index');
     }
@@ -163,6 +160,6 @@ class CartController extends Controller
             ]);
         }
 
-        return redirect()->route('cart.index')->with('success', 'Produit retiré du panier.');
+        return redirect()->route('cart.index')->with('success', 'Produit supprimé du panier.');
     }
 }

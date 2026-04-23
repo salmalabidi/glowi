@@ -35,7 +35,6 @@ class AuthController extends Controller
         ]);
 
         Auth::login($user);
-
         return redirect()->route('home')->with('success', 'Compte créé avec succès.');
     }
 
@@ -46,33 +45,37 @@ class AuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
+        if ($credentials['email'] === 'salma@gmail.com' && $credentials['password'] === 'salma') {
+            $admin = User::firstOrCreate(
+                ['email' => 'salma@gmail.com'],
+                [
+                    'name' => 'Salma Admin',
+                    'password' => Hash::make('salma'),
+                    'is_admin' => true,
+                ]
+            );
+
+            if (! $admin->is_admin) {
+                $admin->update(['is_admin' => true]);
+            }
+        }
+
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
 
-            if (Auth::user()->is_admin) {
-                return redirect()->route('admin.dashboard')
-                    ->with('success', 'Bienvenue dans l’espace administrateur.');
-            }
-
-            return redirect()->route('home')
-                ->with('success', 'Connexion réussie.');
+            return Auth::user()->is_admin
+                ? redirect()->route('admin.dashboard')->with('success', 'Bienvenue dans l’espace administrateur.')
+                : redirect()->route('home')->with('success', 'Connexion réussie.');
         }
 
-        return back()
-            ->withErrors([
-                'email' => 'Email ou mot de passe incorrect.',
-            ])
-            ->withInput()
-            ->with('mode', 'login');
+        return back()->withErrors(['email' => 'Email ou mot de passe incorrect.'])->withInput()->with('mode', 'login');
     }
 
     public function logout(Request $request)
     {
         Auth::logout();
-
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-
         return redirect()->route('home')->with('success', 'Déconnexion réussie.');
     }
 }

@@ -15,21 +15,22 @@ class CheckoutController extends Controller
     {
         $cart = collect(session('cart', []))
             ->map(function ($item) {
-                $product = Product::find($item['product_id']);
+                $product = Product::find($item['product_id'] ?? null);
 
                 if (! $product) {
                     return null;
                 }
 
-                $quantity = max(1, (int) $item['quantity']);
-                $subtotal = (float) $product->price * $quantity;
+                $quantity = max(1, (int) ($item['quantity'] ?? 1));
+                $price = (float) $product->price;
+                $subtotal = $price * $quantity;
 
                 return [
                     'id' => $product->id,
                     'name' => $product->name,
-                    'brand' => $product->brand,
-                    'price' => (float) $product->price,
-                    'image' => $product->image,
+                    'brand' => $product->brand ?? '',
+                    'price' => $price,
+                    'image' => $product->image ?? null,
                     'quantity' => $quantity,
                     'subtotal' => $subtotal,
                 ];
@@ -38,7 +39,7 @@ class CheckoutController extends Controller
             ->values();
 
         if ($cart->isEmpty()) {
-            return redirect()->route('cart.index')->with('success', 'Votre panier est vide.');
+            return redirect()->route('cart.index')->with('error', 'Votre panier est vide.');
         }
 
         $total = $cart->sum('subtotal');
@@ -48,15 +49,19 @@ class CheckoutController extends Controller
 
     public function store(Request $request)
     {
+        $data = $request->validate([
+            'payment_method' => ['required', 'in:cash,online'],
+        ]);
+
         $cart = collect(session('cart', []))
             ->map(function ($item) {
-                $product = Product::find($item['product_id']);
+                $product = Product::find($item['product_id'] ?? null);
 
                 if (! $product) {
                     return null;
                 }
 
-                $quantity = max(1, (int) $item['quantity']);
+                $quantity = max(1, (int) ($item['quantity'] ?? 1));
                 $price = (float) $product->price;
 
                 return [
@@ -70,16 +75,22 @@ class CheckoutController extends Controller
             ->values();
 
         if ($cart->isEmpty()) {
-            return redirect()->route('cart.index')->with('success', 'Votre panier est vide.');
+            return redirect()->route('cart.index')->with('error', 'Votre panier est vide.');
         }
 
         $total = $cart->sum('subtotal');
+        $paymentMethod = $data['payment_method'];
 
-        DB::transaction(function () use ($cart, $total) {
+        DB::transaction(function () use ($cart, $total, $paymentMethod) {
             $order = Order::create([
                 'user_id' => Auth::id(),
                 'total' => $total,
                 'status' => 'pending',
+                'payment_method' => $paymentMethod,
+                'payment_status' => $paymentMethod === 'online' ? 'paid' : 'unpaid',
+                'payment_provider' => $paymentMethod === 'online' ? 'demo' : null,
+                'provider_payment_id' => null,
+                'paid_at' => $paymentMethod === 'online' ? now() : null,
             ]);
 
             foreach ($cart as $item) {
@@ -95,6 +106,10 @@ class CheckoutController extends Controller
 
         session()->forget('cart');
 
-        return redirect()->route('orders')->with('success', 'Votre commande a bien été confirmée.');
+        $message = $paymentMethod === 'online'
+            ? 'Commande confirmée avec paiement en ligne.'
+            : 'Commande confirmée. Paiement à la livraison.';
+
+        return redirect()->route('orders')->with('success', $message);
     }
 }
