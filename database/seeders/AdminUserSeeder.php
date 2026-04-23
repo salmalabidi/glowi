@@ -13,9 +13,9 @@ class AdminUserSeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'salma@gmail.com'],
             [
-                'name' => 'Salma Admin',
+                'name'     => 'Salma Admin',
                 'password' => Hash::make('salma'),
-                'is_admin' => true,
+                'is_admin' => true,   // ← champ correct (pas 'role')
             ]
         );
     }

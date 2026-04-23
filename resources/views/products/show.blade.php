@@ -150,7 +150,47 @@
     color: var(--rose); transition: background 0.2s, color 0.2s;
 }
 .btn-wishlist:hover { background: var(--rose); color: #fff; }
-.btn-login-prompt {
+
+/* ── Acheter maintenant ── */
+.btn-buy-now {
+    width: 100%; padding: 15px 24px;
+    background: linear-gradient(135deg, #3d2030, #1a0f14);
+    color: #fff; border: none; border-radius: 2px;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+}
+.btn-buy-now:hover {
+    background: linear-gradient(135deg, var(--rose-deep), var(--rose));
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(36,18,25,0.25);
+}
+
+/* ── Vendeur info ── */
+.seller-info-box {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px; border-radius: 14px;
+    background: rgba(200,116,138,0.05);
+    border: 1px solid rgba(200,116,138,0.12);
+    margin-top: 18px;
+}
+.seller-info-avatar {
+    width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--rose), var(--rose-deep));
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: .90rem;
+}
+.seller-info-label { font-size: .62rem; letter-spacing: .14em; text-transform: uppercase; color: var(--text-light); }
+.seller-info-name  { font-size: .92rem; color: var(--text); font-weight: 500; }
+.seller-chat-btn {
+    margin-left: auto; padding: 8px 16px; border-radius: 999px;
+    background: rgba(200,116,138,0.10); color: var(--rose-deep);
+    border: 1px solid rgba(200,116,138,0.20); text-decoration: none;
+    font-size: .70rem; letter-spacing: .12em; text-transform: uppercase;
+    transition: background .2s, transform .2s; white-space: nowrap;
+}
+.seller-chat-btn:hover { background: rgba(200,116,138,0.18); transform: translateY(-1px); }
     display: flex; align-items: center; gap: 10px;
     background: var(--rose-pale); padding: 16px 20px;
     border-radius: 2px; border: 1px dashed rgba(200,116,138,0.4);
@@ -531,7 +571,7 @@
                 </span>
             </div>
 
-            <!-- Add to cart -->
+            <!-- Add to cart + Acheter maintenant -->
             @auth
                 @if($product->stock > 0)
                     <div class="purchase-row">
@@ -545,13 +585,34 @@
                         </button>
                         <button class="btn-wishlist" id="wish-btn" onclick="toggleWish(this)">♡</button>
                     </div>
+                    {{-- Bouton Acheter maintenant --}}
+                    <form method="POST" action="{{ route('cart.add') }}" id="buyNowForm" style="margin-top:10px">
+                        @csrf
+                        <input type="hidden" name="product_id" value="{{ $product->id }}">
+                        <input type="hidden" name="quantity" value="1" id="buyNowQty">
+                        <button type="submit" class="btn-buy-now" onclick="syncBuyQty()">
+                            ⚡ Acheter maintenant
+                        </button>
+                    </form>
                 @else
                     <button class="btn-add-cart" disabled>Indisponible</button>
+                @endif
+
+                {{-- Vendeur info + lien chat --}}
+                @if($product->user)
+                    <div class="seller-info-box">
+                        <div class="seller-info-avatar">{{ strtoupper(substr($product->user->name, 0, 1)) }}</div>
+                        <div>
+                            <div class="seller-info-label">Vendu par</div>
+                            <div class="seller-info-name">{{ $product->user->name }}</div>
+                        </div>
+                        <a href="{{ route('chat.index') }}" class="seller-chat-btn">💬 Contacter</a>
+                    </div>
                 @endif
             @else
                 <div class="btn-login-prompt">
                     <span>💎</span>
-                    <span>Connectez-vous pour ajouter au panier — <a href="{{ route('login') }}">Se connecter</a> ou <a href="{{ route('register') }}">Créer un compte</a></span>
+                    <span>Connectez-vous pour acheter — <a href="{{ route('login') }}">Se connecter</a> ou <a href="{{ route('register') }}">Créer un compte</a></span>
                 </div>
             @endauth
 
@@ -775,6 +836,7 @@ async function addToCart(productId) {
         const badge = document.querySelector('.cart-badge');
         if (badge) badge.textContent = (parseInt(badge.textContent)||0) + qty;
         setTimeout(() => { btn.textContent = 'Ajouter au panier'; btn.disabled = false; btn.style.background = ''; }, 2000);
+
     } catch(e) {
         btn.textContent = 'Ajouter au panier'; btn.disabled = false;
     }
@@ -817,5 +879,12 @@ function toggleWish(btn) {
         });
     }
 })();
+
+// Sync qty to "Acheter maintenant" hidden input
+function syncBuyQty() {
+    const q = document.getElementById('qty');
+    const h = document.getElementById('buyNowQty');
+    if (q && h) h.value = q.value;
+}
 </script>
 @endsection
