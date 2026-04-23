@@ -243,9 +243,21 @@
 .status-cancelled { background: rgba(212,98,98,0.14);   color: #a63d3d; }
 
 @keyframes fadeSlideUp {
-    from { opacity:0; transform:translateY(16px); filter:blur(3px); }
-    to   { opacity:1; transform:translateY(0);    filter:blur(0);   }
+    from { opacity:0; transform:translateY(20px) scale(0.97); filter:blur(4px); }
+    to   { opacity:1; transform:translateY(0)    scale(1);    filter:blur(0);   }
 }
+@keyframes pulseGlow {
+    0%,100% { box-shadow:0 18px 42px rgba(200,116,138,.07); }
+    50%      { box-shadow:0 18px 42px rgba(200,116,138,.18), 0 0 0 4px rgba(200,116,138,.06); }
+}
+@keyframes countUp {
+    from { opacity:0; transform:translateY(8px); }
+    to   { opacity:1; transform:translateY(0); }
+}
+.admin-card { animation: fadeSlideUp 0.55s cubic-bezier(.22,.68,0,1.2) both; }
+.admin-card:hover { transform:translateY(-5px) scale(1.02) !important; box-shadow:0 28px 55px rgba(36,18,25,.11) !important; transition:transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .3s !important; }
+.admin-card .card-value { animation: countUp .6s ease both; animation-delay: .3s; }
+.admin-hero { animation: pulseGlow 4s ease-in-out infinite; }
 
 @media (max-width: 1100px) {
     .admin-grid     { grid-template-columns: repeat(2,1fr); }

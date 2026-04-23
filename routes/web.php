@@ -97,7 +97,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile/avatar',           [ProfileController::class, 'deleteAvatar'])->name('profile.avatar.delete');
 
     // ── Commandes client ──────────────────────────────────────────────────
-    Route::get('/orders', [OrderController::class, 'index'])->name('orders');
+    Route::get('/orders',         [OrderController::class, 'index'])->name('orders');
+    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
 
     Route::get('/profile/show', fn() => redirect()->route('profile.index'))->name('profile');
 
