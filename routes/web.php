@@ -11,6 +11,7 @@ use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\UserProductController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\UserController    as AdminUserController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
@@ -18,6 +19,23 @@ use App\Http\Controllers\Admin\OrderController   as AdminOrderController;
 
 // ── HOME ─────────────────────────────────────────────────────────────────────
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// ── CATALOGUE (public) ────────────────────────────────────────────────────────
+Route::get('/products',           [ProductController::class, 'index'])->name('products.index');
+Route::get('/products/search',    [ProductController::class, 'search'])->name('products.search');
+Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
+
+// ── CHAT PUBLIC (visible à tous, envoi = auth) ────────────────────────────────
+Route::get('/chat',         [ChatController::class, 'index'])->name('chat.index');
+Route::get('/chat/poll',    [ChatController::class, 'poll'])->name('chat.poll')->middleware('auth');
+Route::post('/chat',        [ChatController::class, 'store'])->name('chat.store')->middleware('auth');
+
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+Route::get('/login',    [AuthController::class, 'showLogin'])->name('login')->middleware('guest');
+Route::post('/login',   [AuthController::class, 'login'])->middleware('guest');
+Route::get('/register', [AuthController::class, 'showRegister'])->name('register')->middleware('guest');
+Route::post('/register',[AuthController::class, 'register'])->middleware('guest');
+Route::post('/logout',  [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 // ── ADMIN ────────────────────────────────────────────────────────────────────
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -44,28 +62,16 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::delete('/orders/{order}',   [AdminOrderController::class, 'destroy'])->name('orders.destroy');
 });
 
-// ── CATALOGUE (public) ────────────────────────────────────────────────────────
-Route::get('/products',           [ProductController::class, 'index'])->name('products.index');
-Route::get('/products/search',    [ProductController::class, 'search'])->name('products.search');
-Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
-
-// ── AUTH ──────────────────────────────────────────────────────────────────────
-Route::get('/login',    [AuthController::class, 'showLogin'])->name('login')->middleware('guest');
-Route::post('/login',   [AuthController::class, 'login'])->middleware('guest');
-Route::get('/register', [AuthController::class, 'showRegister'])->name('register')->middleware('guest');
-Route::post('/register',[AuthController::class, 'register'])->middleware('guest');
-Route::post('/logout',  [AuthController::class, 'logout'])->name('logout')->middleware('auth');
-
 // ── ROUTES PROTÉGÉES (auth) ───────────────────────────────────────────────────
 Route::middleware('auth')->group(function () {
 
     // ── Mes produits (vendeur) ────────────────────────────────────────────
-    Route::get('/my-products',                  [UserProductController::class, 'index'])->name('user.products.index');
-    Route::get('/my-products/create',           [UserProductController::class, 'create'])->name('user.products.create');
-    Route::post('/my-products',                 [UserProductController::class, 'store'])->name('user.products.store');
-    Route::get('/my-products/{product}/edit',   [UserProductController::class, 'edit'])->name('user.products.edit');
-    Route::put('/my-products/{product}',        [UserProductController::class, 'update'])->name('user.products.update');
-    Route::delete('/my-products/{product}',     [UserProductController::class, 'destroy'])->name('user.products.destroy');
+    Route::get('/my-products',                [UserProductController::class, 'index'])->name('user.products.index');
+    Route::get('/my-products/create',         [UserProductController::class, 'create'])->name('user.products.create');
+    Route::post('/my-products',               [UserProductController::class, 'store'])->name('user.products.store');
+    Route::get('/my-products/{product}/edit', [UserProductController::class, 'edit'])->name('user.products.edit');
+    Route::put('/my-products/{product}',      [UserProductController::class, 'update'])->name('user.products.update');
+    Route::delete('/my-products/{product}',   [UserProductController::class, 'destroy'])->name('user.products.destroy');
 
     // ── Panier ────────────────────────────────────────────────────────────
     Route::get('/cart',                   [CartController::class, 'index'])->name('cart.index');
@@ -84,16 +90,15 @@ Route::middleware('auth')->group(function () {
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
 
     // ── Profil ────────────────────────────────────────────────────────────
-    Route::get('/profile',                   [ProfileController::class, 'index'])->name('profile.index');
-    Route::match(['put','patch'],'/profile',  [ProfileController::class, 'update'])->name('profile.update');
-    Route::patch('/profile/password',         [ProfileController::class, 'updatePassword'])->name('profile.password');
-    Route::patch('/profile/avatar',           [ProfileController::class, 'updateAvatar'])->name('profile.avatar');
-    Route::delete('/profile/avatar',          [ProfileController::class, 'deleteAvatar'])->name('profile.avatar.delete');
+    Route::get('/profile',                    [ProfileController::class, 'index'])->name('profile.index');
+    Route::match(['put','patch'],'/profile',   [ProfileController::class, 'update'])->name('profile.update');
+    Route::patch('/profile/password',          [ProfileController::class, 'updatePassword'])->name('profile.password');
+    Route::patch('/profile/avatar',            [ProfileController::class, 'updateAvatar'])->name('profile.avatar');
+    Route::delete('/profile/avatar',           [ProfileController::class, 'deleteAvatar'])->name('profile.avatar.delete');
 
     // ── Commandes client ──────────────────────────────────────────────────
     Route::get('/orders', [OrderController::class, 'index'])->name('orders');
 
-    // Alias compatibilité
     Route::get('/profile/show', fn() => redirect()->route('profile.index'))->name('profile');
 
     // ── Reviews ───────────────────────────────────────────────────────────
