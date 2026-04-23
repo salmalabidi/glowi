@@ -1,28 +1,19 @@
 @forelse($products as $index => $product)
-    @php
-        $imagePath = $product->image ?? '';
+   @php
+    $imagePath = $product->image ?? '';
 
-        if ($imagePath) {
-            if (\Illuminate\Support\Str::startsWith($imagePath, ['http://', 'https://'])) {
-                $imageUrl = $imagePath;
-            } elseif (\Illuminate\Support\Str::startsWith($imagePath, ['Images/', 'images/'])) {
-                $imageUrl = asset($imagePath);
-            } else {
-                $folder = match ($product->category->slug ?? '') {
-                    'accessoires' => 'ACCESSOIRES',
-                    'maquillage' => 'MAQUILLAGE',
-                    'skincare' => 'SKINCARE',
-                    default => '',
-                };
-
-                $imageUrl = $folder
-                    ? asset('Images/' . $folder . '/' . ltrim($imagePath, '/'))
-                    : asset('Images/' . ltrim($imagePath, '/'));
-            }
+    if ($imagePath) {
+        if (\Illuminate\Support\Str::startsWith($imagePath, ['http://', 'https://'])) {
+            $imageUrl = $imagePath;
+        } elseif (\Illuminate\Support\Str::startsWith($imagePath, ['Images/', 'images/'])) {
+            $imageUrl = asset($imagePath);
         } else {
-            $imageUrl = 'https://via.placeholder.com/400x500/f5e6ea/c8748a?text=' . urlencode($product->name);
+            $imageUrl = asset('storage/' . $imagePath);
         }
-    @endphp
+    } else {
+        $imageUrl = 'https://via.placeholder.com/400x500/f5e6ea/c8748a?text=' . urlencode($product->name);
+    }
+@endphp
 
     <div class="product-card fade-up" style="animation-delay: {{ $index * 0.05 }}s">
         <div class="product-img-wrap">
