@@ -889,12 +889,17 @@
                 <div class="user-menu" id="userMenu">
                     <button type="button" class="user-menu-trigger" id="userMenuTrigger" aria-expanded="false" aria-haspopup="true">
                         <div class="user-avatar">
-                            @if(Auth::user()->avatar)
-                                <img src="{{ Auth::user()->avatar }}" alt="Avatar">
-                            @else
-                                <span>{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</span>
-                            @endif
-                        </div>
+    @if(Auth::user()->avatar)
+        <img
+            src="{{ Str::startsWith(Auth::user()->avatar, ['http://', 'https://', '/storage/'])
+                ? Auth::user()->avatar
+                : asset('storage/' . Auth::user()->avatar) }}"
+            alt="{{ Auth::user()->name }}"
+        >
+    @else
+        <span>{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</span>
+    @endif
+</div>
                     </button>
 
                     <div class="user-dropdown" id="userDropdown">

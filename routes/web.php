@@ -94,4 +94,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 
     Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+Route::post('/chat/store', [ChatController::class, 'store'])->name('chat.store');
+Route::get('/chat/poll', [ChatController::class, 'poll'])->name('chat.poll');
+Route::get('/chat/unread-count', [ChatController::class, 'unreadCount'])->name('chat.unread-count');
+Route::delete('/chat/{user}', [ChatController::class, 'destroy'])->name('chat.destroy');
+
 });

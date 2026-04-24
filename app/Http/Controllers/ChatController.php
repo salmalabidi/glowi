@@ -11,152 +11,158 @@ class ChatController extends Controller
 {
     public function index(Request $request)
     {
-        $me = Auth::user();
-
-        $contacts = User::query()
-            ->where('id', '!=', $me->id)
-            ->orderBy('name')
-            ->get()
-            ->map(function ($user) use ($me) {
-                $lastMessage = Message::betweenUsers($me->id, $user->id)
-                    ->latest('created_at')
-                    ->first();
-
-                $user->unread_count = Message::query()
-                    ->where('user_id', $user->id)
-                    ->where('recipient_id', $me->id)
-                    ->where('is_read', false)
-                    ->count();
-
-                $user->last_message_at = optional($lastMessage)->created_at;
-                $user->last_message_body = optional($lastMessage)->body;
-
-                return $user;
-            })
-            ->sortByDesc(function ($user) {
-                return optional($user->last_message_at)->timestamp ?? 0;
-            })
-            ->values();
-
+        $authId = Auth::id();
         $selectedUser = null;
         $messages = collect();
 
-        if ($request->filled('user')) {
-            $selectedUser = User::findOrFail($request->integer('user'));
+        $contacts = $this->getContacts($authId);
 
-            $messages = Message::betweenUsers($me->id, $selectedUser->id)
-                ->with(['sender', 'recipient'])
+        $totalUnread = Message::where('recipient_id', $authId)
+            ->where('is_read', false)
+            ->count();
+
+        if ($request->filled('user')) {
+            $selectedUser = User::findOrFail($request->user);
+
+            Message::where('user_id', $selectedUser->id)
+                ->where('recipient_id', $authId)
+                ->where('is_read', false)
+                ->update(['is_read' => true]);
+
+            $messages = Message::with('sender')
+                ->betweenUsers($authId, $selectedUser->id)
                 ->orderBy('created_at')
                 ->get();
 
-            Message::query()
-                ->where('user_id', $selectedUser->id)
-                ->where('recipient_id', $me->id)
-                ->where('is_read', false)
-                ->update(['is_read' => true]);
+            $contacts = $this->getContacts($authId);
         }
 
-        $totalUnread = Message::query()
-            ->where('recipient_id', $me->id)
-            ->where('is_read', false)
-            ->count();
-
-        return view('chat.index', compact('contacts', 'selectedUser', 'messages', 'totalUnread'));
-    }
-
-    public function poll(Request $request)
-    {
-        $request->validate([
-            'user' => ['required', 'integer', 'exists:users,id'],
-        ]);
-
-        $me = Auth::user();
-        $otherUserId = (int) $request->user;
-
-        $messages = Message::betweenUsers($me->id, $otherUserId)
-            ->with(['sender', 'recipient'])
-            ->orderBy('created_at')
-            ->get()
-            ->map(function ($message) use ($me) {
-                return [
-                    'id' => $message->id,
-                    'body' => $message->body,
-                    'time' => $message->created_at?->format('H:i'),
-                    'mine' => (int) $message->user_id === (int) $me->id,
-                    'sender_name' => $message->sender?->name,
-                ];
-            });
-
-        Message::query()
-            ->where('user_id', $otherUserId)
-            ->where('recipient_id', $me->id)
-            ->where('is_read', false)
-            ->update(['is_read' => true]);
-
-        $contacts = User::query()
-            ->where('id', '!=', $me->id)
-            ->orderBy('name')
-            ->get()
-            ->map(function ($user) use ($me) {
-                return [
-                    'id' => $user->id,
-                    'unread_count' => Message::query()
-                        ->where('user_id', $user->id)
-                        ->where('recipient_id', $me->id)
-                        ->where('is_read', false)
-                        ->count(),
-                ];
-            });
-
-        $totalUnread = Message::query()
-            ->where('recipient_id', $me->id)
-            ->where('is_read', false)
-            ->count();
-
-        return response()->json([
-            'success' => true,
-            'messages' => $messages,
-            'contacts' => $contacts,
-            'total_unread' => $totalUnread,
-        ]);
+        return view('chat.index', compact(
+            'contacts',
+            'selectedUser',
+            'messages',
+            'totalUnread'
+        ));
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
-            'recipient_id' => ['required', 'integer', 'exists:users,id', 'different:' . Auth::id()],
+            'recipient_id' => ['required', 'exists:users,id'],
             'body' => ['required', 'string', 'max:2000'],
         ]);
 
-        $message = Message::create([
+        Message::create([
             'user_id' => Auth::id(),
             'recipient_id' => $data['recipient_id'],
-            'body' => trim($data['body']),
+            'body' => $data['body'],
             'is_read' => false,
         ]);
 
         return response()->json([
             'success' => true,
-            'message' => [
-                'id' => $message->id,
-                'body' => $message->body,
-                'time' => $message->created_at?->format('H:i'),
-                'mine' => true,
-                'sender_name' => Auth::user()->name,
-            ],
+        ]);
+    }
+
+    public function poll(Request $request)
+    {
+        $request->validate([
+            'user' => ['required', 'exists:users,id'],
+        ]);
+
+        $authId = Auth::id();
+        $selectedUser = User::findOrFail($request->user);
+
+        Message::where('user_id', $selectedUser->id)
+            ->where('recipient_id', $authId)
+            ->where('is_read', false)
+            ->update(['is_read' => true]);
+
+        $messages = Message::with('sender')
+            ->betweenUsers($authId, $selectedUser->id)
+            ->orderBy('created_at')
+            ->get()
+            ->map(function ($message) use ($authId) {
+                return [
+                    'id' => $message->id,
+                    'body' => $message->body,
+                    'mine' => $message->user_id === $authId,
+                    'sender_name' => $message->sender?->name,
+                    'time' => $message->created_at?->format('H:i'),
+                ];
+            });
+
+        return response()->json([
+            'success' => true,
+            'messages' => $messages,
+            'contacts' => $this->contactsForJson($authId),
+            'total_unread' => Message::where('recipient_id', $authId)
+                ->where('is_read', false)
+                ->count(),
         ]);
     }
 
     public function unreadCount()
     {
-        $count = Message::query()
-            ->where('recipient_id', Auth::id())
-            ->where('is_read', false)
-            ->count();
-
         return response()->json([
             'success' => true,
-            'count' => $count,
+            'count' => Message::where('recipient_id', Auth::id())
+                ->where('is_read', false)
+                ->count(),
         ]);
+    }
+
+    public function destroy(User $user)
+    {
+        Message::betweenUsers(Auth::id(), $user->id)->delete();
+
+        return redirect()
+            ->route('chat.index')
+            ->with('success', 'Discussion supprimée.');
+    }
+
+    private function getContacts(int $authId)
+    {
+        $contactIds = Message::where('user_id', $authId)
+            ->orWhere('recipient_id', $authId)
+            ->get()
+            ->flatMap(function ($message) use ($authId) {
+                return [
+                    $message->user_id == $authId
+                        ? $message->recipient_id
+                        : $message->user_id
+                ];
+            })
+            ->unique()
+            ->filter()
+            ->values();
+
+        $contacts = User::whereIn('id', $contactIds)->get();
+
+        foreach ($contacts as $contact) {
+            $lastMessage = Message::betweenUsers($authId, $contact->id)
+                ->latest()
+                ->first();
+
+            $contact->last_message_body = $lastMessage?->body;
+
+            $contact->unread_count = Message::where('user_id', $contact->id)
+                ->where('recipient_id', $authId)
+                ->where('is_read', false)
+                ->count();
+        }
+
+        return $contacts;
+    }
+
+    private function contactsForJson(int $authId)
+    {
+        return $this->getContacts($authId)->map(function ($contact) {
+            return [
+                'id' => $contact->id,
+                'unread_count' => $contact->unread_count ?? 0,
+                'last_message_body' => $contact->last_message_body ?? '',
+            ];
+        })->values();
     }
 }

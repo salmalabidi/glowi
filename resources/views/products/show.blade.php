@@ -572,50 +572,74 @@
                 </span>
             </div>
 
-            <!-- Add to cart + Acheter maintenant -->
-            @auth
-                @if($product->stock > 0)
-                    <div class="purchase-row">
-                        <div class="qty-control">
-                            <button class="qty-btn" onclick="changeQty(-1)">−</button>
-                            <input class="qty-display" type="number" id="qty" value="1" min="1" max="{{ $product->stock }}" readonly>
-                            <button class="qty-btn" onclick="changeQty(1)">+</button>
-                        </div>
-                        <button class="btn-add-cart" id="add-btn" onclick="addToCart({{ $product->id }})">
-                            Ajouter au panier
-                        </button>
-                        <button class="btn-wishlist {{ $inWishlist ? 'wishlisted' : '' }}" id="wish-btn" onclick="toggleWish(this)">{{ $inWishlist ? '♥' : '♡' }}</button>
-                    </div>
-                    {{-- Bouton Acheter maintenant --}}
-                    <form method="POST" action="{{ route('cart.buyNow') }}" id="buyNowForm" style="margin-top:10px">
-                        @csrf
-                        <input type="hidden" name="product_id" value="{{ $product->id }}">
-                        <input type="hidden" name="quantity" value="1" id="buyNowQty">
-                        <button type="submit" class="btn-buy-now" onclick="syncBuyQty()">
-                            ⚡ Acheter maintenant
-                        </button>
-                    </form>
-                @else
-                    <button class="btn-add-cart" disabled>Indisponible</button>
-                @endif
 
-                {{-- Vendeur info + lien chat --}}
-                @if($product->user)
-                    <div class="seller-info-box">
-                        <div class="seller-info-avatar">{{ strtoupper(substr($product->user->name, 0, 1)) }}</div>
-                        <div>
-                            <div class="seller-info-label">Vendu par</div>
-                            <div class="seller-info-name">{{ $product->user->name }}</div>
-                        </div>
-                        <a href="{{ route('chat.index', ['user' => $product->user->id]) }}" class="seller-chat-btn">💬 Discuter</a>
-                    </div>
-                @endif
-            @else
-                <div class="btn-login-prompt">
-                    <span>💎</span>
-                    <span>Connectez-vous pour acheter — <a href="{{ route('login') }}">Se connecter</a> ou <a href="{{ route('register') }}">Créer un compte</a></span>
-                </div>
-            @endauth
+<!-- Add to cart + Acheter maintenant -->
+@auth
+    @if($product->stock > 0)
+        <div class="purchase-row">
+            <div class="qty-control">
+                <button class="qty-btn" onclick="changeQty(-1)">−</button>
+                <input class="qty-display" type="number" id="qty" value="1" min="1" max="{{ $product->stock }}" readonly>
+                <button class="qty-btn" onclick="changeQty(1)">+</button>
+            </div>
+
+            <button class="btn-add-cart" id="add-btn" onclick="addToCart({{ $product->id }})">
+                Ajouter au panier
+            </button>
+
+            <button class="btn-wishlist {{ $inWishlist ? 'wishlisted' : '' }}" id="wish-btn" onclick="toggleWish(this)">
+                {{ $inWishlist ? '♥' : '♡' }}
+            </button>
+        </div>
+
+        <form method="POST" action="{{ route('cart.buyNow') }}" id="buyNowForm" style="margin-top:10px">
+            @csrf
+            <input type="hidden" name="product_id" value="{{ $product->id }}">
+            <input type="hidden" name="quantity" value="1" id="buyNowQty">
+
+            <button type="submit" class="btn-buy-now" onclick="syncBuyQty()">
+                ⚡ Acheter maintenant
+            </button>
+        </form>
+    @else
+        <button class="btn-add-cart" disabled>Indisponible</button>
+    @endif
+@else
+    <div class="btn-login-prompt">
+        <span>💎</span>
+        <span>
+            Connectez-vous pour acheter —
+            <a href="{{ route('login') }}">Se connecter</a>
+            ou
+            <a href="{{ route('register') }}">Créer un compte</a>
+        </span>
+    </div>
+@endauth
+
+{{-- Vendeur info + lien chat --}}
+@php
+    $seller = $product->user ?? \App\Models\User::where('email', 'salma@gmail.com')->first();
+@endphp
+
+<div class="seller-info-box">
+    <div class="seller-info-avatar">
+        {{ strtoupper(substr($seller->name ?? 'S', 0, 1)) }}
+    </div>
+
+    <div>
+        <div class="seller-info-label">Vendu par</div>
+        <div class="seller-info-name">
+            {{ $seller->name ?? 'Salma Admin' }}
+        </div>
+    </div>
+
+    <a
+        href="{{ auth()->check() && $seller ? route('chat.index', ['user' => $seller->id]) : route('login') }}"
+        class="seller-chat-btn"
+    >
+        💬 Discuter
+    </a>
+</div>
 
             <!-- Détails -->
             <ul class="product-details-list">

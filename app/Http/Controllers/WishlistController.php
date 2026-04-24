@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
 use App\Models\Wishlist;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -53,14 +52,25 @@ class WishlistController extends Controller
     public function ids()
     {
         return response()->json(
-            Wishlist::where('user_id', Auth::id())->pluck('product_id')->map(fn($id) => (int) $id)->values()
+            Wishlist::where('user_id', Auth::id())
+                ->pluck('product_id')
+                ->map(fn ($id) => (int) $id)
+                ->values()
         );
     }
 
-    public function remove(Wishlist $wishlist)
+    public function remove($productId)
     {
-        abort_unless($wishlist->user_id === Auth::id(), 403);
-        $wishlist->delete();
+        $deleted = Wishlist::where('user_id', Auth::id())
+            ->where('product_id', $productId)
+            ->delete();
+
+        if (! $deleted) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Produit introuvable dans la wishlist.',
+            ], 404);
+        }
 
         return response()->json([
             'success' => true,
